@@ -1,12 +1,7 @@
 # PRD — DeadDrop
 
 **Nama Produk:** DeadDrop — Privacy-First Digital Dead Man’s Switch Website  
-**Kategori Lomba:** Website Development  
-**Kompetisi:** FIT Competition 2026  
-**Tema:** Digital Impact for Humanitarian Response and Global Well-Being  
-**Track:** Track III — Eksploitasi Identitas dan Data  
-**Jenis Produk:** Website dinamis berbasis keamanan data, privasi, dan perlindungan bukti digital  
-**Target Implementasi MVP:** Live Coding 12 Jam  
+**Jenis Produk:** Website dinamis berbasis keamanan data, privasi, dan perlindungan bukti digital   
 **Rekomendasi Stack:** Next.js, TypeScript, Tailwind CSS, WebCrypto API, PostgreSQL/Supabase, Node.js Cron Job, Nodemailer, optional PGP-compatible delivery layer  
 **Catatan Etika:** DeadDrop dirancang untuk perlindungan dokumen sensitif, jurnalisme investigatif, advokasi HAM, dan keselamatan pekerja kemanusiaan. Sistem tidak dirancang untuk doxxing, pemerasan, penyebaran data pribadi ilegal, atau publikasi materi berbahaya tanpa verifikasi.
 
