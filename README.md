@@ -1,9 +1,9 @@
-# PRD — DeadDrop
+# PRD — Sistem Aman Distribusi Bantuan dan Manajemen Bencana (SADANA)
 
-**Nama Produk:** DeadDrop — Privacy-First Digital Dead Man’s Switch Website  
-**Jenis Produk:** Website dinamis berbasis keamanan data, privasi, dan perlindungan bukti digital   
-**Rekomendasi Stack:** Next.js, TypeScript, Tailwind CSS, WebCrypto API, PostgreSQL/Supabase, Node.js Cron Job, Nodemailer, optional PGP-compatible delivery layer  
-**Catatan Etika:** DeadDrop dirancang untuk perlindungan dokumen sensitif, jurnalisme investigatif, advokasi HAM, dan keselamatan pekerja kemanusiaan. Sistem tidak dirancang untuk doxxing, pemerasan, penyebaran data pribadi ilegal, atau publikasi materi berbahaya tanpa verifikasi.
+**Platform:** Web Application (Responsive Dashboard) menggunakan Laravel 11 + Tailwind CSS + Livewire
+**Database:** PostgreSQL / MySQL (Local Server Portable & Cloud Sync Stack)
+**Tema UI:** High-Contrast Safety (Biru Tua Komando, Orange Penyelamatan, Putih Bersih, dan Hijau Indikator)
+**Role:** Komandan Posko (Admin), Petugas Registrasi, Petugas Logistik, Petugas Medis
 
 ---
 
@@ -11,1752 +11,1128 @@
 
 ## 1.1 Nama Produk
 
-**DeadDrop — Privacy-First Digital Dead Man’s Switch Website**
+**SADANA — Sistem Aman Distribusi Bantuan dan Manajemen Bencana**
 
 ## 1.2 Jenis Produk
 
-DeadDrop adalah website keamanan digital yang membantu jurnalis investigatif, aktivis HAM, whistleblower, pengacara publik, dan pekerja kemanusiaan melindungi dokumen sensitif ketika mereka berada dalam situasi berisiko tinggi.
-
-Website ini menyediakan mekanisme **check-in berkala**, **vault dokumen terenkripsi**, **trusted witness network**, dan **release instruction**. Jika pemilik vault tidak melakukan check-in dalam periode tertentu, sistem dapat memulai proses eskalasi yang melibatkan saksi tepercaya sebelum dokumen dirilis ke penerima yang sudah ditentukan.
-
-Berbeda dari dead man’s switch biasa, DeadDrop tidak langsung merilis dokumen hanya karena pengguna lupa check-in. Sistem dirancang dengan beberapa lapisan pengaman seperti grace period, witness confirmation, manual emergency release, dan audit trail agar risiko false trigger dapat ditekan.
+SADANA adalah platform manajemen operasional penanggulangan bencana berbasis web dengan arsitektur *Offline-First* dan *Secure-by-Design*. Sistem ini dioperasikan sepenuhnya oleh petugas di lapangan secara internal menggunakan jaringan *mesh* atau lokal tanpa ketergantungan internet penuh untuk mengelola pendaftaran korban, distribusi bantuan logistik, rekam medis darurat, dan analitik data terenkripsi demi mencegah eksploitasi data populasi rentan.
 
 ## 1.3 Tujuan Utama
 
-Membangun website yang memungkinkan:
-
-1. Pengguna menyimpan dokumen sensitif secara terenkripsi dari sisi client.
-2. Server hanya menyimpan encrypted blob dan metadata minimal.
-3. Pengguna membuat jadwal check-in berkala.
-4. Pengguna menentukan penerima rilis dokumen sebelum situasi darurat terjadi.
-5. Sistem memberi peringatan jika jadwal check-in hampir melewati batas.
-6. Sistem memulai eskalasi jika pengguna tidak check-in.
-7. Trusted witness dapat memverifikasi apakah rilis dokumen memang perlu dilakukan.
-8. Dokumen hanya bisa dirilis jika syarat trigger terpenuhi.
-9. Seluruh proses memiliki status yang jelas dan dapat diaudit.
-10. MVP dapat dibuat realistis dalam live coding 12 jam tanpa mengorbankan arah konsep utama.
+Meningkatkan efisiensi dan keamanan tata kelola posko bencana melalui implementasi:
+1. **Registrasi Anonim Berbasis Kriptografi:** Petugas registrasi mendata korban menggunakan NIK/IKD/Paspor yang langsung diubah menjadi hash unik sekali pakai (SHA-256) guna meminimalkan risiko eksploitasi identitas.
+2. **Identifikasi Berbasis Token Fisik (QR Wristband):** Korban mendapatkan gelang identitas QR Code yang berfungsi sebagai kunci otorisasi anonim untuk mengklaim logistik bantuan dan layanan medis harian.
+3. **Pemisahan Hak Akses Ketat (RBAC):** Petugas logistik hanya dapat melihat kelayakan klaim bantuan, sedangkan petugas medis hanya memiliki akses ke rekam medis darurat tanpa mengetahui identitas asli korban.
+4. **Mekanisme Pasca-Bencana Aman (Crypto-Shredding):** Sistem menyediakan fitur penghancuran kunci enkripsi (*Master Key*) secara instan setelah masa tanggap darurat selesai untuk memastikan tidak ada jejak digital data sensitif yang tertinggal pada perangkat lokal lapangan.
+5. **Arsitektur Jaringan Tangguh (Offline-First):** Memastikan sistem dapat bekerja 100% menggunakan server lokal portabel (seperti laptop utama atau Raspberry Pi) yang dihubungkan melalui router Wi-Fi lokal di area bencana tanpa koneksi internet.
 
 ---
 
 # 2. Latar Belakang
 
-Di banyak situasi krisis, bukti digital menjadi hal yang sangat penting. Bukti tersebut dapat berupa dokumen korupsi, rekaman pelanggaran HAM, data trafficking, catatan kekerasan, arsip investigasi, atau dokumen sensitif lain yang bernilai tinggi bagi kepentingan publik.
+Pada situasi darurat pascabencana alam atau krisis kemanusiaan, alur birokrasi distribusi bantuan sosial (bansos) konvensional sering kali mewajibkan pengumpulan dokumen fisik berupa fotokopi KTP atau Kartu Keluarga (KK). Lembaran dokumen fisik ini biasanya menumpuk secara acak di posko-posko darurat tanpa sistem pengamanan yang memadai. Petugas lapangan yang kurang terlatih juga kerap mencatat data pribadi korban menggunakan media digital publik seperti Google Sheets yang dibagikan secara bebas melalui grup WhatsApp.
 
-Namun, orang yang memegang bukti tersebut sering berada dalam posisi rentan. Contohnya:
+Kondisi tersebut menciptakan celah eksploitasi data yang sangat masif bagi oknum tidak bertanggung jawab. Kasus pencurian identitas (*identity theft*) terhadap korban bencana untuk keperluan pengajuan pinjaman online (pinjol) ilegal, pemerasan, hingga penipuan terstruktur marak terjadi karena minimnya pengamanan data pada sektor akar rumput kemanusiaan.
 
-* jurnalis investigatif yang mendapat tekanan,
-* aktivis HAM di wilayah konflik,
-* pengacara publik yang mendampingi korban,
-* whistleblower korporat atau pemerintahan,
-* relawan kemanusiaan yang mendokumentasikan pelanggaran,
-* peneliti atau tenaga medis di wilayah berisiko tinggi.
-
-Masalah yang sering terjadi:
-
-* dokumen penting hilang karena perangkat disita,
-* bukti tidak pernah sampai ke pihak tepercaya,
-* pengguna tidak sempat mengirim dokumen sebelum ditangkap atau menghilang,
-* penerima tidak tahu kapan harus membuka dokumen,
-* penyimpanan cloud biasa masih menyimpan risiko kebocoran,
-* rilis otomatis tanpa validasi dapat memicu kesalahan fatal,
-* pengguna tidak punya mekanisme aman untuk mengatur rilis bersyarat.
-
-Karena itu, DeadDrop dibuat sebagai website yang menggabungkan perlindungan dokumen, check-in berkala, trusted witness, dan mekanisme release berbasis kondisi.
-
-Alur utama yang ingin dibangun:
-
-**pengguna membuat vault → upload dokumen terenkripsi → mengatur check-in → memilih witness dan recipient → melakukan check-in berkala → jika tidak check-in, sistem eskalasi → witness memverifikasi → dokumen dirilis sesuai instruksi.**
+Di sisi lain, tantangan infrastruktur di area bencana seperti putusnya aliran listrik dan hilangnya sinyal telekomunikasi membuat aplikasi berbasis *cloud server* konvensional sama sekali tidak dapat diandalkan. Oleh karena itu, SADANA hadir sebagai solusi platform manajemen internal posko bencana yang menggabungkan kecepatan operasional lapangan, ketangguhan *offline*, dan proteksi enkripsi data tingkat tinggi untuk menjamin bantuan sampai ke tangan yang tepat tanpa mengorbankan privasi para korban.
 
 ---
 
-# 3. Kesesuaian dengan Tema dan Track
+# 3. Visi Produk
 
-## 3.1 Kesesuaian dengan Tema Besar
-
-Tema FIT Competition 2026 adalah **Digital Impact for Humanitarian Response and Global Well-Being**. DeadDrop sesuai dengan tema tersebut karena fokus pada perlindungan aktor kemanusiaan dan keamanan informasi sensitif dalam situasi krisis.
-
-DeadDrop mendukung aspek tema berikut:
-
-* respons kemanusiaan non-bencana, terutama perlindungan bukti digital,
-* keamanan informasi sensitif,
-* perlindungan populasi dan pekerja rentan,
-* penggunaan teknologi digital untuk mencegah hilangnya bukti,
-* mekanisme berbasis data dan status untuk pengambilan keputusan,
-* koordinasi antara pemilik dokumen, witness, dan penerima tepercaya,
-* keberlanjutan advokasi melalui preservasi bukti.
-
-## 3.2 Kesesuaian dengan Track III
-
-Track yang dipilih adalah **Track III — Eksploitasi Identitas dan Data**.
-
-Fokus Track III adalah perlindungan jejak digital, privasi, dan autentisitas informasi bagi populasi rentan dalam lingkungan dengan risiko keamanan tinggi.
-
-DeadDrop sesuai dengan Track III karena:
-
-1. **Kerangka Privasi**  
-   Website menerapkan client-side encryption, metadata minimization, dan akses berbasis role.
-
-2. **Pertukaran Data Aman**  
-   Dokumen tidak langsung dibuka oleh server. Dokumen hanya dapat dirilis melalui skenario yang sudah ditentukan.
-
-3. **Integritas dan Arsitektur Sistem**  
-   Sistem memiliki audit trail, status rilis, dan arsitektur secure-by-design untuk mencegah penyalahgunaan data sensitif.
+Menyediakan sistem informasi internal penanggulangan bencana yang:
+* **Zero-Trust Data Protection:** Mengutamakan privasi korban melalui metode enkripsi end-to-end, minimalisasi data, dan pemisahan role petugas secara absolut.
+* **Disaster-Ready Architecture:** Mampu beroperasi secara instan di area minim infrastruktur menggunakan pendekatan *Offline-First* berbasis jaringan lokal.
+* **High-Speed Operations:** Mengurangi antrean fisik posko melalui integrasi pemindaian QR Code yang cepat.
+* **Academic & Competitive Power:** Menjadi proyek perangkat lunak unggulan yang mendemonstrasikan penerapan konsep Object-Oriented Programming (OOP) tingkat lanjut, manajemen basis data relasional yang aman, serta implementasi nyata dari kriteria *Track III (Eksploitasi Identitas dan Data)* pada FIT Competition 2026.
 
 ---
 
-# 4. Visi Produk
+# 4. Tujuan Produk
 
-Menyediakan website perlindungan dokumen sensitif yang:
+## 4.1 Tujuan Operasional
+* Mempercepat proses pendataan korban di posko darurat menggunakan metode digital terenkripsi.
+* Menyediakan fitur *vouching* (penjaminan) terstruktur untuk memvalidasi korban luar domisili (turis/tamu) tanpa mengabaikan aspek akuntabilitas.
+* Mencegah terjadinya duplikasi klaim bantuan sosial harian melalui pencatatan transaksi berbasis token QR tunggal.
+* Memfasilitasi pelayanan medis darurat yang cepat dengan integrasi rekam medis anonim.
+* Memberikan visualisasi data agregat (grafik logistik dan statistik kesehatan) kepada Komandan Posko untuk mempermudah pengambilan keputusan taktis tanpa mengekspos data pribadi korban.
 
-* aman digunakan oleh pengguna berisiko tinggi,
-* tidak menyimpan plaintext dokumen di server,
-* memiliki check-in mechanism yang mudah dipahami,
-* mengurangi risiko false trigger,
-* menyediakan witness network untuk validasi rilis,
-* memberikan kontrol penuh kepada pemilik vault,
-* memiliki UI minimalis, tenang, dan tidak mencolok,
-* realistis dibuat sebagai MVP dalam babak final,
-* kuat dari sisi inovasi, keamanan, dan relevansi kemanusiaan.
-
----
-
-# 5. Tujuan Produk
-
-## 5.1 Tujuan Operasional
-
-* Membantu pengguna menyimpan dokumen sensitif secara aman.
-* Menyediakan mekanisme check-in berkala.
-* Menyediakan eskalasi jika pengguna tidak melakukan check-in.
-* Memungkinkan witness memverifikasi kondisi sebelum release.
-* Memungkinkan recipient menerima dokumen sesuai instruksi.
-* Mengurangi risiko dokumen hilang ketika pengguna berada dalam bahaya.
-* Mengurangi risiko server membaca isi dokumen.
-* Memberikan status dan audit trail yang jelas.
-
-## 5.2 Tujuan Kompetisi
-
-DeadDrop dirancang agar kuat pada aspek penilaian lomba:
-
-* relevan dengan tema humanitarian response,
-* memiliki urgensi masalah yang kuat,
-* memiliki novelty tinggi melalui kombinasi dead man’s switch, client-side encryption, dan witness threshold,
-* memiliki keunikan software yang jelas dibanding cloud storage biasa,
-* memiliki arsitektur sistem yang matang,
-* tetap realistis untuk MVP 12 jam,
-* dapat dipresentasikan dengan flow demo yang kuat dan mudah dipahami.
+## 4.2 Tujuan Akademik
+Menunjukkan keahlian tim dalam merekayasa perangkat lunak modern yang menerapkan prinsip:
+* **Encapsulation:** Mengunci properti sensitif seperti kunci enkripsi melalui enkapsulasi class yang ketat.
+* **Inheritance:** Mengatur variasi role petugas dan profil pengguna melalui hierarki kelas yang bersih.
+* **Polymorphic Authorization:** Menentukan fungsionalitas menu dasbor secara dinamis berdasarkan tipe *subclass* user yang aktif.
+* **Abstraction & Clean Architecture:** Memisahkan logika enkripsi data kemanusiaan dari lapisan presentasi UI dengan menggunakan *Pattern Service* dan *Repository*.
 
 ---
 
-# 6. Ruang Lingkup Website
+# 5. Ruang Lingkup Sistem
 
-## 6.1 Yang Termasuk dalam Website
+## 5.1 Yang Termasuk dalam Sistem
+1. Otentikasi dan login multi-role untuk petugas internal posko.
+2. Dasbor analitik real-time yang disesuaikan berdasarkan hak akses role petugas.
+3. Modul registrasi korban (Input data identitas primer -> hashing otomatis -> konversi ke token QR).
+4. Modul manajemen penjaminan (*Vouching System*) bagi warga non-domisili / turis menggunakan akun verifikator lokal (RT/RW/Pengelola).
+5. Modul distribusi logistik (Scan QR -> validasi kelayakan klaim harian -> potong stok barang otomatis).
+6. Modul penanganan medis (Scan QR -> pemeriksaan klinis darurat/triage -> rekam medis anonim).
+7. Master data barang logistik bantuan (stok, kategori, ambang batas minimum).
+8. Master data klasifikasi penyakit darurat untuk mempermudah input dokter.
+9. Fitur penangguhan/revokasi token QR gelang yang dilaporkan hilang.
+10. Fitur simulasi sinkronisasi data lokal-ke-cloud (*Local-to-Cloud Database Synchronization*) saat internet tersedia.
+11. Fitur *Crypto-Shredding* (Penghancuran Master Key) via interaksi dasbor Komandan Posko untuk menghapus kemampuan dekripsi basis data lokal.
 
-1. Landing page low-profile.
-2. Login dan registrasi pengguna.
-3. Dashboard pengguna.
-4. Pembuatan vault.
-5. Upload dokumen terenkripsi dari sisi client.
-6. Daftar dokumen dalam vault.
-7. Pengaturan check-in interval.
-8. Check-in manual.
-9. Countdown status check-in.
-10. Grace period sebelum eskalasi.
-11. Manajemen trusted witness.
-12. Manajemen recipient.
-13. Release instruction.
-14. Trigger rule dasar berbasis missed check-in.
-15. Witness confirmation.
-16. Emergency release now.
-17. Status vault.
-18. Audit trail aktivitas.
-19. Simulasi trigger untuk demo.
-20. Dashboard witness.
-21. Dashboard recipient.
-22. Mode tampilan minimal/low-profile.
-
-## 6.2 Yang Tidak Termasuk dalam MVP
-
-1. Integrasi berita otomatis untuk mendeteksi penangkapan.
-2. Web scraping kondisi eksternal.
-3. Blockchain.
-4. Aplikasi mobile native.
-5. Browser extension.
-6. Enkripsi hardware security key.
-7. Multi-device secure sync kompleks.
-8. Full implementation hidden volume seperti VeraCrypt.
-9. Public leak portal.
-10. Integrasi identitas pemerintah.
-11. Secure messaging end-to-end kompleks.
-12. Automatic public publishing ke media sosial.
-
-## 6.3 Batasan MVP 12 Jam
-
-Untuk live coding 12 jam, fitur difokuskan pada:
-
-1. login sederhana,
-2. dashboard vault owner,
-3. upload file dan enkripsi client-side,
-4. penyimpanan encrypted blob,
-5. check-in timer,
-6. release instruction sederhana,
-7. witness approval simulasi,
-8. trigger missed check-in,
-9. email notification ke recipient,
-10. audit log,
-11. UI dashboard yang jelas.
+## 5.2 Yang Tidak Termasuk dalam Sistem
+1. Aplikasi komersial untuk masyarakat umum / korban (aplikasi murni bersifat internal operasional).
+2. Sistem e-commerce pembelanjaan barang bansos.
+3. Integrasi sistem pembayaran bank atau dompet digital.
+4. Pengiriman notifikasi SMS/WhatsApp ke nomor pribadi korban (guna menjaga kerahasiaan nomor telepon).
+5. Fitur pelacakan lokasi GPS korban secara real-time (anti-surveillance).
+6. Manajemen multi-cabang posko lintas negara yang kompleks.
 
 ---
 
-# 7. Role Pengguna
+# 6. Role Pengguna
 
-## 7.1 Vault Owner
+## 6.1 Komandan Posko (Admin Utama)
+Penanggung jawab tertinggi operasional taktis militer/sipil di area bencana.
+* **Tugas Utama:**
+  * Mengelola pembuatan dan penonaktifan akun petugas lapangan.
+  * Memantau dasbor agregat stok logistik dan grafik penyebaran penyakit di posko.
+  * Mengatur kuota maksimal distribusi bantuan per Kepala Keluarga.
+  * Menyetujui atau membatalkan hak akses perangkat server lokal portabel.
+  * Mengeksekusi perintah *Crypto-Shredding* ketika misi tanggap darurat dinyatakan berakhir.
 
-Vault Owner adalah pengguna utama yang menyimpan dokumen sensitif dan mengatur kondisi rilis.
+## 6.2 Petugas Registrasi
+Petugas front-office di gerbang utama posko darurat.
+* **Tugas Utama:**
+  * Memvalidasi identitas fisik korban (KTP/IKD/Paspor/Tamu).
+  * Menginput data ke form pendaftaran digital untuk diubah menjadi *ciphertext* oleh sistem.
+  * Mencatat penjamin lokal jika korban merupakan warga luar domisili.
+  * Melakukan *generate* dan mencetak QR Code pada gelang fisik korban.
 
-### Tugas Utama Vault Owner
+## 6.3 Petugas Logistik
+Petugas gudang atau pos pembagian barang bantuan makanan, pakaian, dan tenda.
+* **Tugas Utama:**
+  * Mengelola kuantitas stok barang masuk dari donatur.
+  * Memindai QR Code gelang korban menggunakan webcam laptop atau barcode scanner.
+  * Memeriksa status kelayakan klaim bantuan korban pada sistem.
+  * Melakukan input data pengambilan bantuan (sistem otomatis memotong stok gudang).
 
-* Registrasi dan login.
-* Membuat vault.
-* Upload dokumen ke vault.
-* Mengatur jadwal check-in.
-* Melakukan check-in berkala.
-* Menambah trusted witness.
-* Menambah recipient.
-* Membuat release instruction.
-* Melihat countdown check-in.
-* Melihat status vault.
-* Melakukan emergency release.
-* Melihat audit trail.
-
-## 7.2 Trusted Witness
-
-Trusted Witness adalah pihak tepercaya yang bertugas memberi konfirmasi ketika terjadi trigger.
-
-### Tugas Utama Trusted Witness
-
-* Menerima undangan witness.
-* Login ke dashboard witness.
-* Melihat permintaan konfirmasi.
-* Memberi keputusan confirm atau reject release.
-* Menambahkan catatan konfirmasi.
-* Melihat riwayat permintaan witness.
-
-## 7.3 Release Recipient
-
-Release Recipient adalah pihak yang ditentukan untuk menerima dokumen jika kondisi rilis terpenuhi.
-
-### Tugas Utama Release Recipient
-
-* Menerima notifikasi rilis.
-* Mengakses release package jika diizinkan.
-* Melihat instruksi yang disiapkan oleh Vault Owner.
-* Mengunduh file terenkripsi atau menerima file yang sudah dirilis sesuai skenario MVP.
-* Melihat catatan release.
-
-## 7.4 System Admin
-
-System Admin bertanggung jawab pada operasional sistem, tetapi tidak memiliki akses ke plaintext dokumen.
-
-### Tugas Utama System Admin
-
-* Melihat statistik sistem.
-* Mengelola akun bermasalah.
-* Melihat audit sistem.
-* Menonaktifkan akun jika melanggar ketentuan.
-* Tidak dapat membaca isi dokumen vault.
-* Tidak dapat memaksa release tanpa aturan sistem.
+## 6.4 Petugas Medis (Dokter / Perawat)
+Tenaga kesehatan di posko kesehatan lapangan darurat.
+* **Tugas Utama:**
+  * Menerima pasien korban bencana berdasarkan pemindaian QR gelang.
+  * Melihat riwayat klinis anonim, alergi obat, dan penyakit kronis korban terdahulu.
+  * Mengisi data *triage* (tingkat kegawatan medis: Merah, Kuning, Hijau, Hitam).
+  * Menginput diagnosis penyakit utama dan mencatat obat yang diberikan lapangan.
 
 ---
 
-# 8. Matriks Hak Akses
+# 7. Matriks Hak Akses
 
-| Fitur | Vault Owner | Trusted Witness | Release Recipient | System Admin |
-| --- | ---: | ---: | ---: | ---: |
-| Registrasi akun | Ya | Via undangan | Via undangan | Tidak |
-| Login | Ya | Ya | Ya | Ya |
-| Dashboard | Ya | Ya | Ya | Ya |
-| Buat vault | Ya | Tidak | Tidak | Tidak |
-| Upload dokumen | Ya | Tidak | Tidak | Tidak |
-| Lihat dokumen sendiri | Ya | Tidak | Setelah release | Tidak |
-| Baca plaintext dokumen | Hanya owner | Tidak | Setelah release valid | Tidak |
-| Atur check-in | Ya | Tidak | Tidak | Tidak |
-| Melakukan check-in | Ya | Tidak | Tidak | Tidak |
-| Tambah witness | Ya | Tidak | Tidak | Tidak |
-| Tambah recipient | Ya | Tidak | Tidak | Tidak |
-| Buat release instruction | Ya | Tidak | Tidak | Tidak |
-| Emergency release | Ya | Tidak | Tidak | Tidak |
-| Konfirmasi release | Tidak | Ya | Tidak | Tidak |
-| Terima release package | Tidak | Tidak | Ya | Tidak |
-| Lihat audit vault | Ya | Terbatas | Terbatas | Metadata sistem |
-| Kelola akun | Tidak | Tidak | Tidak | Terbatas |
-| Baca encrypted blob | Tidak berguna tanpa key | Tidak | Tidak | Tidak berguna tanpa key |
+| Fitur Utama Sistem | Komandan Posko | Petugas Registrasi | Petugas Logistik | Petugas Medis |
+| :--- | :---: | :---: | :---: | :---: |
+| Pembuatan Akun Petugas | **Ya** | Tidak | Tidak | Tidak |
+| Lihat Grafik Statistik Agregat | **Ya** | Tidak | Tidak | Tidak |
+| Pendaftaran Korban Baru | Tidak | **Ya** | Tidak | Tidak |
+| Cetak QR Wristband | Tidak | **Ya** | Tidak | Tidak |
+| Verifikasi Korban Non-Domisili | Tidak | **Ya** | Tidak | Tidak |
+| Kelola Master Stok Logistik | **Ya** | Tidak | **Ya** | Tidak |
+| Pemindaian QR Klaim Logistik | Tidak | Tidak | **Ya** | Tidak |
+| Lihat Riwayat Klaim Logistik | **Ya** | Tidak | **Ya** | Tidak |
+| Input Data Triage & Medis | Tidak | Tidak | Tidak | **Ya** |
+| Lihat Rekam Medis Anonim | Tidak | Tidak | Tidak | **Ya** |
+| Trigger Sinkronisasi Cloud | **Ya** | Tidak | Tidak | Tidak |
+| Trigger Fitur Crypto-Shredding | **Ya** | Tidak | Tidak | Tidak |
 
 ---
 
-# 9. Gambaran Umum Alur Website
+# 8. Gambaran Umum Alur Sistem
 
-1. Vault Owner membuka website DeadDrop.
-2. Vault Owner registrasi dan login.
-3. Vault Owner membuat vault baru.
-4. Vault Owner mengatur check-in interval, misalnya 3, 7, atau 14 hari.
-5. Vault Owner upload dokumen sensitif.
-6. Browser mengenkripsi dokumen sebelum dikirim ke server.
-7. Server menyimpan encrypted blob dan metadata minimal.
-8. Vault Owner menambahkan trusted witness.
-9. Vault Owner menambahkan release recipient.
-10. Vault Owner membuat release instruction.
-11. Vault Owner melakukan check-in berkala.
-12. Jika check-in terlewat, sistem memasuki grace period.
-13. Jika grace period tetap terlewat, sistem membuat trigger event.
-14. Trusted Witness menerima permintaan konfirmasi.
-15. Jika threshold witness terpenuhi, sistem mengaktifkan release package.
-16. Recipient menerima notifikasi.
-17. Audit log mencatat seluruh perubahan status.
 
----
-
-# 10. Fitur Utama Website
-
-## 10.1 Landing Page Low-Profile
-
-### Deskripsi
-
-Landing page menjelaskan DeadDrop sebagai privacy-first secure vault tanpa visual yang terlalu mencolok.
-
-### Subfitur
-
-* Hero section sederhana.
-* Penjelasan masalah.
-* Penjelasan cara kerja.
-* Penekanan pada client-side encryption.
-* Call-to-action login/register.
-* Tanpa publikasi daftar pengguna atau dokumen.
-
-### Output Halaman
-
-| Komponen | Bentuk Tampilan |
-| --- | --- |
-| Hero | Headline dan subheadline |
-| Problem section | Teks ringkas |
-| Workflow | Step card |
-| Security promise | Card fitur |
-| CTA | Tombol masuk |
-
----
-
-## 10.2 Registrasi dan Login
-
-### Deskripsi
-
-Fitur autentikasi untuk membedakan role dan melindungi akses dashboard.
-
-### Subfitur
-
-* Registrasi Vault Owner.
-* Login semua role.
-* Logout.
-* Validasi email dan password.
-* Role-based redirect.
-* Session management.
-* Akun aktif/nonaktif.
-
----
-
-## 10.3 Dashboard Vault Owner
-
-### Tujuan
-
-Memberikan gambaran cepat tentang status vault, check-in, witness, recipient, dan risiko release.
-
-### Informasi yang Ditampilkan
-
-**A. Summary Cards**
-
-1. Status vault.
-2. Sisa waktu check-in.
-3. Jumlah dokumen terenkripsi.
-4. Jumlah witness aktif.
-5. Jumlah recipient.
-6. Status trigger.
-7. Status release instruction.
-
-**B. Tabel Cepat**
-
-1. Dokumen terbaru.
-2. Witness list.
-3. Recipient list.
-4. Audit log terbaru.
-
-**C. Alert**
-
-1. Check-in hampir melewati batas.
-2. Witness belum menerima undangan.
-3. Release instruction belum lengkap.
-4. Vault sedang dalam grace period.
-
----
-
-## 10.4 Encrypted Document Vault
-
-### Deskripsi
-
-Vault adalah tempat penyimpanan dokumen sensitif. Dokumen harus dienkripsi di browser sebelum dikirim ke server.
-
-### Subfitur
-
-* Buat vault.
-* Upload dokumen.
-* Enkripsi client-side.
-* Simpan encrypted blob.
-* Lihat daftar dokumen.
-* Hapus dokumen.
-* Unduh encrypted blob.
-* Status dokumen.
-
-### Data Dokumen
-
-* ID dokumen.
-* Vault ID.
-* Nama file terenkripsi atau disamarkan.
-* Ukuran file.
-* MIME type.
-* Encryption algorithm.
-* Encrypted blob path.
-* Created at.
-
----
-
-## 10.5 Check-in Mechanism
-
-### Deskripsi
-
-Check-in adalah mekanisme utama untuk memastikan Vault Owner masih aman dan aktif.
-
-### Subfitur
-
-* Atur interval check-in: 3, 7, 14, atau custom.
-* Manual check-in.
-* Countdown check-in.
-* Grace period.
-* Status check-in.
-* Simulasi missed check-in untuk demo.
-
-### Status Check-in
-
-1. Aman.
-2. Mendekati Deadline.
-3. Grace Period.
-4. Missed Check-in.
-5. Triggered.
-
----
-
-## 10.6 Release Instruction
-
-### Deskripsi
-
-Release instruction adalah aturan tentang apa yang harus dilakukan jika kondisi release terpenuhi.
-
-### Data Release Instruction
-
-* Vault ID.
-* Pesan untuk recipient.
-* Daftar dokumen yang akan dirilis.
-* Trigger type.
-* Witness threshold.
-* Delivery method.
-* Status aktif.
-
-### Trigger MVP
-
-Trigger utama pada MVP:
-
-```text
-Jika Vault Owner tidak check-in sampai deadline + grace period,
-maka sistem membuat trigger event dan meminta witness confirmation.
 ```
 
-### Trigger Lanjutan
+[Korban Datang] ──> (Pos Registrasi: Input KTP/Tamu) ──> [Sistem: Hashing SHA-256 + Enkripsi AES]
+│
+▼
+[Petugas Medis: Isi Rekam Medis] <── (Cetak QR Wristband) ──> [Petugas Logistik: Scan QR Klaim Bansos]
+│                                                                 │
+▼                                                                 ▼
+(Simpan Histori Medis Anonim)                                     (Otomatis Potong Stok Gudang)
+│
+▼
+[Misi Selesai] ──> (Komandan Jalankan Crypto-Shredding) ──> [Database Lokal Terkunci Selamanya]
 
-Trigger lanjutan untuk versi berikutnya:
-
-* missed check-in + witness confirmation,
-* manual emergency release,
-* verified external event,
-* scheduled release,
-* revocation by owner sebelum trigger final.
-
----
-
-## 10.7 Trusted Witness Network
-
-### Deskripsi
-
-Trusted witness network digunakan untuk mengurangi risiko false trigger. Release tidak langsung dilakukan hanya karena owner lupa check-in.
-
-### Subfitur
-
-* Tambah witness.
-* Kirim undangan witness.
-* Witness menerima/menolak undangan.
-* Threshold approval.
-* Witness memberi catatan.
-* Riwayat witness decision.
-
-### Contoh Threshold
-
-| Skema | Keterangan |
-| --- | --- |
-| 1 dari 1 | Cepat, tetapi risiko false trigger tinggi |
-| 2 dari 3 | Seimbang untuk keamanan dan validasi |
-| 3 dari 5 | Lebih kuat, tetapi lebih lambat |
-
-### Catatan MVP
-
-Pada MVP, Shamir’s Secret Sharing dapat dijelaskan sebagai desain lanjutan. Implementasi live coding dapat menggunakan simulasi threshold approval terlebih dahulu agar realistis.
+```
 
 ---
 
-## 10.8 Release Package
+# 9. Fitur Utama Sistem
 
-### Deskripsi
+## 9.1 Otentikasi & Proteksi Sesi Internal
+* **Deskripsi:** Fitur gerbang masuk petugas posko yang menggunakan pengamanan token sesi lokal di dalam memori RAM server lapangan.
+* **Subfitur:**
+  * Login Multi-Role dengan proteksi enkripsi password bcrypt.
+  * Otomatisasi pemutusan sesi (*Session Timeout*) jika perangkat tidak mendeteksi aktivitas petugas selama 15 menit.
+  * Validasi kecocokan MAC Address laptop petugas dengan daftar putih (*Whitelisting*) yang diizinkan oleh Komandan Posko.
 
-Release package adalah paket dokumen dan instruksi yang dapat diberikan kepada recipient setelah syarat release terpenuhi.
+## 9.2 Dasbor Informasi Taktis Berbasis Role
+Setiap petugas diarahkan ke halaman dasbor khusus yang menyajikan informasi fungsional tanpa membuang waktu operasional.
 
-### Subfitur
+### 9.2.1 Dasbor Komandan Posko (Pusat Kendali)
+* **Summary Cards:** Total korban terdata, total logistik aman (hari), grafik tren penyakit tertinggi, jumlah petugas aktif di lapangan.
+* **Tabel Cepat:** Log sinkronisasi data ke cloud, alert stok barang logistik kritis di bawah batas minimum.
+* **Fitur Taktis:** Tombol merah darurat *Crypto-Shredding* dengan konfirmasi kata sandi ganda.
 
-* Buat release package.
-* Pilih dokumen untuk release.
-* Tambah pesan/instruksi.
-* Tetapkan recipient.
-* Status package.
-* Kirim notifikasi release.
+### 9.2.2 Dasbor Petugas Registrasi
+* **Summary Cards:** Jumlah korban yang berhasil didaftarkan hari ini, jumlah token QR aktif, statistik korban lokal vs luar daerah.
+* **Form Utama:** Input data cepat terintegrasi pembaca kartu IKD/KTP digital.
 
-### Status Release Package
+### 9.2.3 Dasbor Petugas Logistik
+* **Summary Cards:** Total bantuan keluar hari ini, sisa stok beras/air bersih/pakaian, daftar donatur terbaru.
+* **Komponen Utama:** Jendela pemindaian kamera aktif (*Live Scanner Web*) untuk membaca gelang korban secara instan.
 
-1. Draft.
-2. Armed.
-3. Triggered.
-4. Awaiting Witness.
-5. Approved.
-6. Released.
-7. Cancelled.
-
----
-
-## 10.9 Emergency Release Now
-
-### Deskripsi
-
-Fitur untuk Vault Owner merilis dokumen secara manual jika merasa berada dalam ancaman langsung.
-
-### Subfitur
-
-* Tombol emergency release.
-* Konfirmasi ganda.
-* Ringkasan konsekuensi.
-* Aktivasi release package.
-* Audit log.
-* Notifikasi recipient.
-
-### Validasi
-
-* Owner harus login.
-* Owner harus memasukkan passphrase ulang.
-* Owner harus mengonfirmasi peringatan.
-* Status vault harus aktif.
+### 9.2.4 Dasbor Petugas Medis
+* **Summary Cards:** Pasien dalam antrean darurat, total pasien tertangani hari ini, grafik statistik status warna *triage*.
+* **Tabel Utama:** Daftar nomor antrean medis anonim beserta rincian keluhan awal krisis.
 
 ---
 
-## 10.10 Decoy Workspace / Low-Profile Mode
-
-### Deskripsi
-
-Low-profile mode membuat tampilan website tidak mencolok dan tidak menampilkan informasi sensitif di halaman awal dashboard.
-
-### Subfitur
-
-* Tampilan seperti note workspace sederhana.
-* Nama file dapat disamarkan.
-* Informasi sensitif tidak ditampilkan di sidebar.
-* Vault detail hanya muncul setelah re-authentication.
-
-### Catatan Keamanan
-
-MVP cukup menampilkan mode visual low-profile. Implementasi hidden volume kriptografis penuh tidak termasuk dalam MVP karena kompleks dan membutuhkan audit keamanan serius.
+## 9.3 Manajemen Kriptografi & Masking Identitas (Fitur Inti Track III)
+* **Deskripsi:** Modul pengolah data di balik layar (*back-end processing*) yang mengamankan privasi korban semenjak data diinput pertama kali.
+* **Spesifikasi Teknis:**
+  * **Algoritma Hashing:** Mengubah NIK korb menjadi `hash('sha256', $nik)` untuk memvalidasi duplikasi data tanpa menyimpan teks NIK asli ke database.
+  * **Data Masking:** Data nama korban diubah menjadi inisial acak pada tampilan visual petugas logistik dan medis (contoh: "Ahmad Jailani" hanya terbaca sebagai "Korban AJ - ID 982").
+  * **Dynamic Encryption:** Informasi alamat dan nomor telepon dienkripsi menggunakan metode `AES-256-CBC` dengan kunci dinamis yang disimpan di memori RAM server, bukan pada file konfigurasi `.env` statis.
 
 ---
 
-## 10.11 Audit Trail
-
-### Deskripsi
-
-Audit trail mencatat aktivitas penting agar perubahan status dapat dilacak.
-
-### Aktivitas yang Dicatat
-
-* Login.
-* Upload dokumen.
-* Perubahan check-in interval.
-* Check-in berhasil.
-* Missed check-in.
-* Trigger event dibuat.
-* Witness memberi keputusan.
-* Release package approved.
-* Release package dikirim.
-* Emergency release.
-
-### Catatan Privasi
-
-Audit trail tidak menyimpan isi dokumen atau plaintext sensitif.
+## 9.4 Modul Penjaminan Korban Luar Domisili (Vouching System)
+* **Deskripsi:** Mengakomodasi kebutuhan hukum bantuan kemanusiaan bagi turis atau warga luar daerah yang kehilangan dokumen identitas saat krisis terjadi.
+* **Aturan Kerja:**
+  * Petugas registrasi memilih opsi "Warga Luar Daerah/Tanpa KTP".
+  * Sistem meminta input data akun "Penjamin Lokal" (bisa berupa nomor KK warga lokal pemilik tempat menginap, ID petugas pengelola hotel, atau ID Ketua RT setempat).
+  * Sistem membatasi kuota penjaminan (*Vouching Quota Limitation*) maksimal 3 orang per kepala keluarga lokal untuk memitigasi kecurangan pencairan bansos oleh spekulan.
 
 ---
 
-## 10.12 Dashboard Witness
-
-### Tujuan
-
-Memudahkan witness melihat permintaan konfirmasi release.
-
-### Informasi yang Ditampilkan
-
-1. Daftar vault yang mengundang witness.
-2. Status undangan.
-3. Permintaan konfirmasi aktif.
-4. Deadline konfirmasi.
-5. Tombol confirm/reject.
-6. Catatan keputusan.
-7. Riwayat keputusan.
+## 9.5 Modul Manajemen Logistik & Validasi Klaim Ganda
+* **Deskripsi:** Mengontrol keluar masuknya komoditas logistik posko dan mendeteksi upaya penipuan klaim ganda bantuan.
+* **Subfitur:**
+  * Inventory Management (Tambah stok, input nama donatur, konversi satuan kemasan).
+  * Pembatasan Frekuensi Klaim: Saat QR Code gelang discan, sistem mengecek tabel `logistic_claims`. Jika korban sudah mengambil jatah makan siang pada hari tersebut, sistem memunculkan warna merah (*Alert: Double Claim Detected*).
 
 ---
 
-## 10.13 Dashboard Recipient
-
-### Tujuan
-
-Memudahkan recipient melihat release package yang sudah sah dirilis.
-
-### Informasi yang Ditampilkan
-
-1. Daftar release package.
-2. Nama owner atau alias.
-3. Pesan release.
-4. Waktu release.
-5. Daftar file.
-6. Tombol download.
-7. Catatan integritas.
+## 9.6 Modul Rekam Medis Darurat & Triage Posko
+* **Deskripsi:** Membantu penanganan medis taktis tanpa mengabaikan kerahasiaan riwayat kesehatan masa lalu pasien krisis.
+* **Subfitur:**
+  * Penentuan Kategori Triage (Merah = Kritis, Kuning = Cedera Berat, Hijau = Ringan, Hitam = Meninggal Dunia).
+  * Pencatatan riwayat alergi obat darurat yang terenkripsi dalam tabel terpisah yang hanya dapat didekripsi oleh kunci privat milik dokter pemeriksa yang sah.
 
 ---
 
-## 10.14 System Admin Dashboard
+# 10. Use Case Utama
 
-### Tujuan
-
-Memberikan pengawasan operasional tanpa akses plaintext dokumen.
-
-### Informasi yang Ditampilkan
-
-1. Total user.
-2. Total vault.
-3. Total encrypted blob.
-4. Total trigger event.
-5. Total release event.
-6. Akun flagged.
-7. Audit sistem.
+1. **UC-01:** Registrasi Petugas Lapangan Baru oleh Komandan.
+2. **UC-02:** Login Petugas dan Whitelisting Perangkat Server Lokal.
+3. **UC-03:** Pendaftaran Korban dengan Sistem Auto-Hashing NIK.
+4. **UC-04:** Pembuatan dan Pencetakan Gelang QR Token Kemanusiaan.
+5. **UC-05:** Validasi Penjaminan (*Vouching*) Korban Luar Domisili.
+6. **UC-06:** Pemindaian QR dan Pengambilan Jatah Logistik Bantuan.
+7. **UC-07:** Input Hasil Pemeriksaan Klinis dan Penentuan Status Triage.
+8. **UC-08:** Pemantauan Grafik Agregat Inventaris oleh Komandan Posko.
+9. **UC-09:** Sinkronisasi Manual Data Posko Lokal ke Server Cloud Pusat.
+10. **UC-10:** Penghancuran Kunci Enkripsi Komando (*Crypto-Shredding Trigger*).
 
 ---
 
-# 11. Use Case Utama
-
-## 11.1 Use Case List
-
-1. Registrasi Vault Owner.
-2. Login.
-3. Buat vault.
-4. Upload dokumen terenkripsi.
-5. Atur check-in interval.
-6. Melakukan check-in.
-7. Tambah trusted witness.
-8. Tambah recipient.
-9. Buat release instruction.
-10. Trigger missed check-in.
-11. Witness confirmation.
-12. Emergency release.
-13. Terima release package.
-14. Lihat audit trail.
-15. Lihat dashboard sesuai role.
-
----
-
-# 12. Diagram Use Case
+# 11. Diagram Use Case
 
 ```mermaid
 flowchart LR
-    O[Vault Owner]
-    W[Trusted Witness]
-    R[Release Recipient]
-    A[System Admin]
+    K[Komandan Posko]
+    PR[Petugas Registrasi]
+    PL[Petugas Logistik]
+    PM[Petugas Medis]
 
-    subgraph Sistem[DeadDrop Website]
-        UC1([Registrasi])
-        UC2([Login])
-        UC3([Dashboard])
-        UC4([Buat Vault])
-        UC5([Upload Dokumen Terenkripsi])
-        UC6([Atur Check-in])
-        UC7([Melakukan Check-in])
-        UC8([Tambah Witness])
-        UC9([Tambah Recipient])
-        UC10([Buat Release Instruction])
-        UC11([Trigger Missed Check-in])
-        UC12([Witness Confirmation])
-        UC13([Emergency Release])
-        UC14([Terima Release Package])
-        UC15([Lihat Audit Trail])
-        UC16([Kelola Akun Terbatas])
+    subgraph SADANA[Sistem Informasi SADANA]
+        UC1([UC-01: Kelola Akun Petugas])
+        UC2([UC-02: Login & Whitelisting])
+        UC3([UC-03: Registrasi Korban & Hash NIK])
+        UC4([UC-04: Cetak Gelang QR])
+        UC5([UC-05: Verifikasi Vouching Tamu])
+        UC6([UC-06: Scan QR & Klaim Logistik])
+        UC7([UC-07: Input Triage & Medis Anonim])
+        UC8([UC-08: Pantau Grafik Agregat Posko])
+        UC9([UC-09: Sinkronisasi Cloud])
+        UC10([UC-10: Eksekusi Crypto-Shredding])
     end
 
-    O --> UC1
-    O --> UC2
-    O --> UC3
-    O --> UC4
-    O --> UC5
-    O --> UC6
-    O --> UC7
-    O --> UC8
-    O --> UC9
-    O --> UC10
-    O --> UC13
-    O --> UC15
+    K --> UC1
+    K --> UC2
+    PR --> UC2
+    PL --> UC2
+    PM --> UC2
 
-    W --> UC2
-    W --> UC3
-    W --> UC12
-    W --> UC15
+    PR --> UC3
+    PR --> UC4
+    PR --> UC5
 
-    R --> UC2
-    R --> UC3
-    R --> UC14
+    PL --> UC6
+    PM --> UC7
 
-    A --> UC2
-    A --> UC3
-    A --> UC16
-    A --> UC15
+    K --> UC8
+    K --> UC9
+    K --> UC10
 
-    UC11 --> UC12
-    UC12 --> UC14
 ```
 
 ---
 
-# 13. Alur Kerja Sistem
+# 12. Alur Kerja Sistem
 
-## 13.1 Alur Pembuatan Vault
+## 12.1 Alur Registrasi Korban dan Penerbitan Gelang Identitas
 
-1. Vault Owner login.
-2. Vault Owner membuka dashboard.
-3. Vault Owner memilih menu Create Vault.
-4. Vault Owner mengisi nama vault, interval check-in, dan grace period.
-5. Sistem memvalidasi data.
-6. Sistem membuat vault dengan status Draft.
-7. Vault Owner mengunggah dokumen.
-8. Browser mengenkripsi dokumen.
-9. Sistem menyimpan encrypted blob.
-10. Vault Owner menambahkan witness dan recipient.
-11. Vault Owner membuat release instruction.
-12. Status vault berubah menjadi Armed.
+1. Korban mendatangi meja pendaftaran posko.
+2. Petugas Registrasi membuka Form Pendaftaran pada web aplikasi SADANA lokal.
+3. Petugas menginput data nama, tanggal lahir, dan nomor KTP/Paspor.
+4. Di sisi *back-end*, sistem memproses nomor KTP menggunakan fungsi kriptografi SHA-256 menjadi string acak sepanjang 64 karakter.
+5. Sistem memeriksa ke dalam database apakah string hash tersebut sudah terdaftar sebelumnya.
+6. Jika aman, nama korban dienkripsi dengan metode AES-256, kemudian sistem menerbitkan kode token acak (UUID v4) yang dicetak menjadi QR Code pada gelang fisik korban.
 
-## 13.2 Alur Check-in
+## 12.2 Alur Distribusi Logistik dan Pencegahan Klaim Ganda
 
-1. Vault Owner login.
-2. Dashboard menampilkan countdown check-in.
-3. Vault Owner menekan tombol Check-in.
-4. Sistem meminta konfirmasi.
-5. Sistem memperbarui last check-in time.
-6. Sistem menghitung deadline berikutnya.
-7. Audit log mencatat check-in berhasil.
-8. Status vault kembali Aman.
-
-## 13.3 Alur Missed Check-in dan Witness Confirmation
-
-1. Scheduler mengecek vault aktif.
-2. Sistem menemukan vault melewati deadline check-in.
-3. Sistem mengubah status menjadi Grace Period.
-4. Jika grace period terlewat, sistem membuat trigger event.
-5. Status release package menjadi Awaiting Witness.
-6. Witness menerima notifikasi.
-7. Witness membuka dashboard.
-8. Witness memilih confirm atau reject.
-9. Jika jumlah confirm memenuhi threshold, release package approved.
-10. Sistem mengirim notifikasi ke recipient.
-11. Audit log mencatat release event.
-
-## 13.4 Alur Emergency Release
-
-1. Vault Owner login.
-2. Vault Owner membuka vault detail.
-3. Vault Owner menekan Emergency Release Now.
-4. Sistem meminta passphrase ulang dan konfirmasi ganda.
-5. Vault Owner menyetujui.
-6. Sistem mengubah status release package menjadi Released.
-7. Recipient menerima notifikasi.
-8. Audit log mencatat emergency release.
+1. Korban membawa gelang QR ke tenda logistik untuk mengambil jatah makan harian.
+2. Petugas Logistik mengarahkan gelang QR ke kamera barcode scanner laptop.
+3. Sistem memvalidasi token QR ke tabel `victims`.
+4. Jika token valid, sistem membaca status kelayakan pada hari itu melalui query ke tabel `logistic_claims`.
+5. Apabila korban terdeteksi sudah mengambil haknya dalam parameter waktu yang ditentukan (misal: Kategori Makan Siang pukul 11:00 - 14:00), sistem menolak dan membunyikan alarm visual di dasbor petugas logistik.
+6. Jika belum, petugas menyerahkan barang bantuan, menekan tombol "Konfirmasi Penyerahan", dan stok komoditas di tabel `medicines/goods` otomatis berkurang secara real-time.
 
 ---
 
-# 14. Diagram Aktivitas Pembuatan Vault
+# 13. Diagram Aktivitas Registrasi & Vouching
 
 ```mermaid
 flowchart TD
-    A([Mulai]) --> B[Vault Owner login]
-    B --> C[Buka dashboard]
-    C --> D[Buat vault baru]
-    D --> E[Isi interval check-in dan grace period]
-    E --> F[Upload dokumen]
-    F --> G[Enkripsi dokumen di browser]
-    G --> H[Simpan encrypted blob]
-    H --> I[Tambah witness]
-    I --> J[Tambah recipient]
-    J --> K[Buat release instruction]
-    K --> L{Data lengkap?}
-    L -- Tidak --> M[Tampilkan checklist belum lengkap]
-    M --> I
-    L -- Ya --> N[Status vault = Armed]
-    N --> O([Selesai])
+    Start([Mulai Pendataan Korban]) --> Login[Petugas Registrasi Login]
+    Login --> OpenForm[Buka Form Registrasi Lapangan]
+    OpenForm --> CheckDom[Apakah Korban Memiliki KTP Lokal?]
+    
+    CheckDom -- Ya --> InputNIK[Input NIK KTP Fisik / IKD]
+    InputNIK --> HashProcess[Sistem Jalankan Auto-Hash SHA-256]
+    HashProcess --> CheckDup{Apakah Hash NIK Sudah Ada?}
+    CheckDup -- Ya --> RejectForm[Tampilkan Peringatan: Korban Sudah Terdaftar]
+    CheckDup -- Tidak --> EncryptData[Enkripsi Data Pribadi via AES-256]
+    
+    CheckDom -- Tidak --> InputVouch[Input ID Warga Lokal Sebagai Penjamin]
+    InputVouch --> CheckQuota{Kuota Penjamin Aman?}
+    CheckQuota -- Tidak --> RejectVouch[Tolak Pendaftaran: Kuota RT/KK Penuh]
+    CheckQuota -- Ya --> EncryptData
+    
+    EncryptData --> GenUUID[Generate Token UUID Keamanan]
+    GenUUID --> PrintQR[Cetak Token Menjadi QR Code Gelang]
+    PrintQR --> End([Selesai - Gelang Diserahkan])
+    RejectForm --> End
+    RejectVouch --> End
+
 ```
 
 ---
 
-# 15. Diagram Aktivitas Trigger Release
+# 14. Diagram Aktivitas Pelayanan Medis Darurat
 
 ```mermaid
 flowchart TD
-    A([Scheduler berjalan]) --> B[Cek vault aktif]
-    B --> C{Deadline check-in lewat?}
-    C -- Tidak --> D[Vault tetap Aman]
-    C -- Ya --> E[Status = Grace Period]
-    E --> F{Grace period lewat?}
-    F -- Tidak --> G[Tunggu check-in]
-    F -- Ya --> H[Buat trigger event]
-    H --> I[Status release = Awaiting Witness]
-    I --> J[Kirim notifikasi witness]
-    J --> K[Witness memberi keputusan]
-    K --> L{Threshold terpenuhi?}
-    L -- Tidak --> M[Tunggu witness lain / timeout]
-    L -- Ya --> N[Release package approved]
-    N --> O[Kirim notifikasi recipient]
-    O --> P[Audit log release]
+    A([Mulai Pelayanan Medis]) --> B[Scan QR Code Gelang Korban]
+    B --> C[Sistem Membaca Token UUID]
+    C --> D{Apakah Token Valid?}
+    D -- Tidak --> E[Tampilkan Pesan: Gelang Tidak Terdaftar / Expired]
+    D -- Ya --> F[Sistem Tampilkan Profil Anonim & Riwayat Alergi]
+    F --> G[Dokter Mengisi Form Pemeriksaan Darurat]
+    G --> H[Pilih Status Tingkat Triage Medis]
+    H --> I{Apakah Pasien Membutuhkan Obat?}
+    I -- Ya --> J[Pilih Obat dari Tabel Inventaris Medis]
+    J --> K[Sistem Validasi Stok Obat Lokal]
+    K --> L{Stok Cukup?}
+    L -- Ya --> M[Kurangi Stok Obat Otomatis]
+    L -- Tidak --> N[Tampilkan Alert: Stok Obat Habis]
+    N --> J
+    M --> O[Simpan Hasil Rekam Medis Darurat]
+    I -- Tidak --> O
+    O --> P[Status Kunjungan Medis = Selesai]
     P --> Q([Selesai])
+    E --> Q
+
 ```
 
 ---
 
-# 16. Kebutuhan Fungsional
+# 15. Kebutuhan Fungsional
 
-## 16.1 Modul Registrasi
+## 15.1 Modul Kriptografi Lapangan (Security Engine)
 
-* Sistem harus memungkinkan pengguna membuat akun Vault Owner.
-* Sistem harus memvalidasi email unik.
-* Sistem harus menyimpan password dalam bentuk hash.
-* Sistem harus membuat profil pengguna setelah registrasi.
+* Sistem harus langsung melakukan hashing satu arah pada data NIK/Paspor di memori RAM sebelum query SQL dikirimkan ke database lokal.
+* Sistem harus mengenkripsi kolom alamat dan nomor telepon menggunakan kunci enkripsi simetris dinamis.
+* Sistem harus menyediakan mekanisme pengecekan berkala terhadap integritas tabel database untuk mendeteksi manipulasi data luar.
 
-## 16.2 Modul Login
+## 15.2 Modul Penanganan Jaringan Offline-First
 
-* Sistem harus menerima email dan password.
-* Sistem harus memvalidasi kredensial.
-* Sistem harus mengecek status akun aktif.
-* Sistem harus mengarahkan user ke dashboard sesuai role.
-
-## 16.3 Modul Dashboard
-
-* Sistem harus menampilkan dashboard berbeda untuk Vault Owner, Witness, Recipient, dan Admin.
-* Dashboard Vault Owner harus menampilkan status vault dan check-in.
-* Dashboard Witness harus menampilkan permintaan konfirmasi.
-* Dashboard Recipient harus menampilkan release package yang sah.
-* Dashboard Admin hanya menampilkan metadata operasional.
-
-## 16.4 Modul Vault
-
-* Vault Owner dapat membuat vault.
-* Vault Owner dapat mengubah pengaturan vault selama belum triggered.
-* Vault Owner dapat mengaktifkan atau menonaktifkan vault.
-* Vault harus memiliki status.
-* Vault harus terhubung ke owner.
-
-## 16.5 Modul Encrypted Document
-
-* Vault Owner dapat mengunggah dokumen.
-* Dokumen harus dienkripsi sebelum dikirim ke server.
-* Server hanya menyimpan encrypted blob.
-* Sistem harus menyimpan metadata dokumen minimal.
-* Vault Owner dapat menghapus dokumen sebelum release.
-
-## 16.6 Modul Check-in
-
-* Vault Owner dapat mengatur interval check-in.
-* Sistem harus menyimpan last check-in.
-* Sistem harus menghitung next check-in deadline.
-* Sistem harus menampilkan countdown.
-* Sistem harus mengubah status jika check-in terlewat.
-
-## 16.7 Modul Witness
-
-* Vault Owner dapat menambah witness.
-* Sistem harus mengirim undangan witness.
-* Witness dapat menerima atau menolak undangan.
-* Witness dapat memberi keputusan confirm/reject saat trigger.
-* Sistem harus menghitung threshold witness.
-
-## 16.8 Modul Recipient
-
-* Vault Owner dapat menambah recipient.
-* Recipient dapat menerima notifikasi release.
-* Recipient hanya dapat mengakses release package setelah status valid.
-* Recipient tidak dapat melihat vault sebelum release.
-
-## 16.9 Modul Release Instruction
-
-* Vault Owner dapat membuat release instruction.
-* Release instruction harus memiliki trigger type.
-* Release instruction harus memiliki recipient minimal satu.
-* Release instruction harus memiliki witness threshold jika witness mode aktif.
-* Sistem harus menjalankan release berdasarkan status trigger.
-
-## 16.10 Modul Audit Trail
-
-* Sistem harus mencatat aktivitas penting.
-* Audit log tidak boleh menyimpan plaintext dokumen.
-* Owner dapat melihat audit vault miliknya.
-* Admin dapat melihat audit metadata sistem.
+* Sistem harus dapat berjalan normal menggunakan protokol komunikasi lokal HTTP tanpa koneksi internet WAN.
+* Sistem harus menyediakan fitur penyimpanan *Queue* lokal di dalam IndexedDB browser petugas apabila laptop operator kehilangan koneksi ke server router lokal portabel untuk sementara waktu.
+* Sistem harus mendukung ekspor data terenkripsi ke dalam format file biner terkompresi (.bin) untuk dipindahkan secara manual menggunakan flashdisk ke posko pusat apabila sinkronisasi online mengalami kegagalan total.
 
 ---
 
-# 17. Kebutuhan Non-Fungsional
+# 16. Kebutuhan Non-Fungsional
 
-1. Website harus responsif untuk desktop dan mobile browser.
-2. Website harus memiliki UI minimalis dan tidak mencolok.
-3. Dokumen harus dienkripsi dari sisi client sebelum upload.
-4. Server tidak boleh menyimpan plaintext dokumen.
-5. Server tidak boleh menyimpan passphrase asli.
-6. Password harus disimpan dalam bentuk hash.
-7. Role-based access control wajib diterapkan.
-8. Data sensitif harus diminimalkan.
-9. Sistem harus memiliki audit trail.
-10. Sistem harus menampilkan status check-in dengan jelas.
-11. Sistem harus cukup ringan untuk demo live coding 12 jam.
-12. MVP harus bisa didemokan end-to-end.
-13. Semua input wajib divalidasi di frontend dan backend.
-14. Desain keamanan harus dijelaskan secara transparan pada proposal.
-15. Fitur kriptografi lanjutan harus ditandai sebagai roadmap jika tidak sempat diimplementasikan penuh.
+1. **Sistem Operasi Perangkat:** Aplikasi berbasis web harus kompatibel dengan browser modern (Google Chrome / Mozilla Firefox) yang berjalan di OS Windows, Linux, maupun macOS pada laptop lapangan petugas.
+2. **Kecepatan Respons Pemanduan:** Proses pembacaan QR Code lewat webcam hingga validasi database tidak boleh melebihi waktu 1,5 detik per orang untuk mencegah kerumunan massa di tenda posko.
+3. **Desain Antarmuka (UI):** Menggunakan framework Tailwind CSS dengan tema kontras tinggi yang ramah untuk penggunaan di bawah sinar matahari langsung maupun kondisi pencahayaan tenda darurat yang redup.
+4. **Keamanan Database Lokal:** Hak akses root database pada server laptop portabel wajib dilindungi kata sandi acak berkekuatan tinggi yang di-generate otomatis saat instalasi sistem pertama kali.
 
 ---
 
-# 18. Aturan Bisnis
+# 17. Aturan Bisnis (Business Rules)
 
-1. Setiap akun hanya memiliki satu role utama.
-2. Vault hanya dapat dibuat oleh Vault Owner.
-3. Vault Owner hanya dapat melihat vault miliknya sendiri.
-4. Dokumen harus dienkripsi sebelum dikirim ke server.
-5. Vault belum dapat diaktifkan jika belum memiliki minimal satu dokumen, satu recipient, dan release instruction.
-6. Check-in hanya dapat dilakukan oleh Vault Owner.
-7. Missed check-in tidak langsung merilis dokumen; sistem harus masuk grace period terlebih dahulu.
-8. Jika witness mode aktif, release membutuhkan jumlah approval sesuai threshold.
-9. Recipient tidak dapat mengakses release package sebelum status Released.
-10. System Admin tidak dapat membaca plaintext dokumen.
-11. Emergency release hanya dapat dilakukan oleh Vault Owner setelah konfirmasi ulang.
-12. Vault yang sudah Released tidak dapat kembali menjadi Armed tanpa membuat release package baru.
-13. Audit log tidak boleh dihapus oleh user biasa.
-14. User nonaktif tidak dapat login.
-15. Witness yang belum menerima undangan tidak dihitung dalam threshold.
-16. Recipient harus sudah ditentukan sebelum vault armed.
-17. Release instruction harus jelas dan tidak boleh kosong.
+1. Satu nomor token QR gelang hanya boleh terikat pada satu profil identitas korban yang valid di dalam sistem.
+2. Petugas lapangan dilarang keras memiliki hak akses untuk mengekspor atau melihat daftar tabel database secara keseluruhan (*No Bulk Data Export for Officers*).
+3. Validasi status klaim bantuan logistik harian didasarkan pada zona waktu lokal server posko darurat tempat barang tersebut didistribusikan.
+4. Otoritas penjaminan (*Vouching*) warga non-domisili hanya dapat diberikan oleh pengguna sistem yang memiliki tingkat verifikasi akun minimal setingkat Kepala Urusan Desa atau Petugas Registrasi Internal Senior.
+5. Perintah penghancuran data (*Crypto-Shredding*) bersifat merusak secara permanen dan tidak dapat dibatalkan (*Irreversible Command*). Begitu tombol ditekan, data yang terenkripsi tidak akan pernah bisa dibaca lagi selamanya.
 
 ---
 
-# 19. Validasi Data
+# 18. Validasi Data
 
-* Email tidak boleh kosong.
-* Email harus unik.
-* Password tidak boleh kosong.
-* Password minimal 8 karakter.
-* Nama vault tidak boleh kosong.
-* Check-in interval harus lebih dari 0 hari.
-* Grace period harus lebih dari atau sama dengan 0 jam.
-* File dokumen tidak boleh kosong.
-* Ukuran file mengikuti batas maksimal sistem.
-* Recipient email harus valid.
-* Witness email harus valid.
-* Witness threshold tidak boleh lebih besar dari jumlah witness aktif.
-* Release instruction tidak boleh kosong.
-* Emergency release harus meminta konfirmasi ulang.
-* Status vault hanya boleh menggunakan status yang ditentukan.
-* Status release package hanya boleh menggunakan status yang ditentukan.
+* Field Nama Korban tidak boleh mengandung karakter angka atau simbol khusus.
+* Panjang data NIK KTP wajib tepat berisi 16 digit angka numerik.
+* Sistem harus menolak pemindaian QR gelang jika status token di database telah diatur menjadi `Ditangguhkan / Hilang`.
+* Jumlah input pengambilan logistik bantuan tidak boleh bernilai negatif atau bernilai lebih besar daripada sisa stok riil yang tercatat di sistem gudang.
+* Catatan klasifikasi rekam medis darurat wajib memiliki status kode *triage* yang jelas sebelum data pemeriksaan dapat disimpan oleh dokter.
 
 ---
 
-# 20. Use Case Specification
+# 19. Use Case Specification
 
-## 20.1 Use Case — Registrasi Vault Owner
+## 19.1 Use Case — Registrasi Korban & Auto-Hash NIK
 
-| Elemen | Deskripsi |
+| Elemen Spesifikasi | Deskripsi Detail |
 | --- | --- |
-| Nama | Registrasi Vault Owner |
-| Aktor | Vault Owner |
-| Tujuan | Membuat akun pengguna utama |
-| Prasyarat | Pengguna belum memiliki akun |
-| Alur Utama | 1. Pengguna membuka halaman registrasi. 2. Pengguna mengisi nama, email, dan password. 3. Sistem memvalidasi email unik. 4. Sistem menyimpan akun dengan role Vault Owner. 5. Sistem mengarahkan pengguna ke login atau dashboard. |
-| Hasil | Akun Vault Owner berhasil dibuat |
+| **Nama Use Case** | Registrasi Korban & Auto-Hash NIK |
+| **Aktor Utama** | Petugas Registrasi |
+| **Tujuan** | Mendaftarkan identitas korban bencana secara aman tanpa mengeksploitasi data pribadi asli. |
+| **Prasyarat** | Petugas telah login ke sistem lokal SADANA dan komputer terhubung ke printer gelang. |
+| **Alur Utama Kerja** | 1. Petugas membuka form input pendaftaran korban krisis.<br>
 
-## 20.2 Use Case — Buat Vault
+<br>2. Petugas memasukkan nama inisial, tanggal lahir, dan nomor NIK asli.<br>
 
-| Elemen | Deskripsi |
+<br>3. Sistem mendeteksi input NIK dan melakukan konversi enkripsi satu arah SHA-256 secara real-time di memori RAM.<br>
+
+<br>4. Sistem memeriksa apakah string hash tersebut sudah ada di tabel database lokal.<br>
+
+<br>5. Jika unik, data pribadi dienkripsi dengan AES-256 dan disimpan ke database.<br>
+
+<br>6. Sistem menerbitkan UUID v4 baru sebagai representasi token gelang digital korban. |
+| **Kondisi Akhir** | Profil korban tersimpan dengan aman, identitas asli tersembunyi, dan gelang QR siap dicetak. |
+
+## 19.2 Use Case — Eksekusi Fitur Crypto-Shredding Pasca-Bencana
+
+| Elemen Spesifikasi | Deskripsi Detail |
 | --- | --- |
-| Nama | Buat Vault |
-| Aktor | Vault Owner |
-| Tujuan | Membuat ruang penyimpanan dokumen terenkripsi |
-| Prasyarat | User login sebagai Vault Owner |
-| Alur Utama | 1. Owner membuka menu Create Vault. 2. Owner mengisi nama vault, interval check-in, dan grace period. 3. Sistem memvalidasi data. 4. Sistem membuat vault dengan status Draft. |
-| Hasil | Vault baru berhasil dibuat |
+| **Nama Use Case** | Eksekusi Fitur Crypto-Shredding Pasca-Bencana |
+| **Aktor Utama** | Komandan Posko (Admin Utama) |
+| **Tujuan** | Menghancurkan kunci enkripsi utama secara permanen untuk mengunci database lokal selamanya dari risiko kebocoran data. |
+| **Prasyarat** | Masa tanggap darurat bencana telah resmi dinyatakan selesai oleh pemerintah pusat. |
+| **Alur Utama Kerja** | 1. Komandan Posko membuka menu Pengaturan Keamanan Tingkat Tinggi di Dasbor Utama.<br>
 
-## 20.3 Use Case — Upload Dokumen Terenkripsi
+<br>2. Komandan menekan tombol merah bertuliskan "Akhiri Misi & Hancurkan Kunci Enkripsi Lokal".<br>
 
-| Elemen | Deskripsi |
-| --- | --- |
-| Nama | Upload Dokumen Terenkripsi |
-| Aktor | Vault Owner |
-| Tujuan | Menyimpan dokumen sensitif tanpa plaintext di server |
-| Prasyarat | Vault sudah dibuat |
-| Alur Utama | 1. Owner memilih file. 2. Browser mengenkripsi file. 3. Sistem mengirim encrypted blob ke server. 4. Server menyimpan encrypted blob dan metadata minimal. |
-| Hasil | Dokumen tersimpan dalam bentuk terenkripsi |
+<br>3. Sistem memunculkan jendela pop-up peringatan keras dan meminta input kata sandi konfirmasi.<br>
 
-## 20.4 Use Case — Check-in
+<br>4. Komandan memasukkan kata sandi rahasia komando.<br>
 
-| Elemen | Deskripsi |
-| --- | --- |
-| Nama | Check-in |
-| Aktor | Vault Owner |
-| Tujuan | Memberi tanda bahwa owner masih aman/aktif |
-| Prasyarat | Vault aktif dan belum triggered |
-| Alur Utama | 1. Owner membuka dashboard. 2. Owner menekan tombol Check-in. 3. Sistem memperbarui last check-in. 4. Sistem menghitung deadline berikutnya. 5. Audit log mencatat aktivitas. |
-| Hasil | Status check-in diperbarui |
+<br>5. Sistem mengeksekusi fungsi penghapusan file kunci enkripsi (*Master Key*) menggunakan metode pengisian data acak (*shredding overwrite*) sebanyak 3 siklus berturut-turut pada sektor penyimpanan fisik.<br>
 
-## 20.5 Use Case — Witness Confirmation
-
-| Elemen | Deskripsi |
-| --- | --- |
-| Nama | Witness Confirmation |
-| Aktor | Trusted Witness |
-| Tujuan | Memvalidasi apakah release perlu dilakukan |
-| Prasyarat | Trigger event aktif dan witness mendapat permintaan konfirmasi |
-| Alur Utama | 1. Witness login. 2. Witness membuka permintaan aktif. 3. Witness membaca konteks permintaan. 4. Witness memilih confirm atau reject. 5. Sistem menyimpan keputusan. 6. Sistem menghitung threshold. |
-| Hasil | Keputusan witness tercatat dan threshold diperbarui |
-
-## 20.6 Use Case — Emergency Release
-
-| Elemen | Deskripsi |
-| --- | --- |
-| Nama | Emergency Release |
-| Aktor | Vault Owner |
-| Tujuan | Merilis package secara manual dalam kondisi darurat |
-| Prasyarat | Owner login dan vault aktif |
-| Alur Utama | 1. Owner membuka vault. 2. Owner menekan Emergency Release Now. 3. Sistem meminta passphrase/konfirmasi ulang. 4. Owner menyetujui. 5. Sistem mengubah status release menjadi Released. 6. Recipient menerima notifikasi. |
-| Hasil | Release package aktif dan recipient diberi akses |
-
-## 20.7 Use Case — Terima Release Package
-
-| Elemen | Deskripsi |
-| --- | --- |
-| Nama | Terima Release Package |
-| Aktor | Release Recipient |
-| Tujuan | Mengakses dokumen dan instruksi setelah release valid |
-| Prasyarat | Release package berstatus Released |
-| Alur Utama | 1. Recipient menerima notifikasi. 2. Recipient login atau membuka secure link. 3. Sistem memvalidasi akses. 4. Sistem menampilkan pesan release dan dokumen yang tersedia. |
-| Hasil | Recipient dapat mengakses release package |
+<br>6. Sistem memutus koneksi database dan melakukan force-logout pada seluruh sesi petugas aktif. |
+| **Kondisi Akhir** | Database lokal terkunci secara absolut menjadi teks acak yang mustahil didekripsi kembali selamanya. Perangkat laptop lapangan kini aman dikembalikan ke instansi asal. |
 
 ---
 
-# 21. Desain Database
+# 20. Desain Database
 
-## 21.1 Daftar Tabel
+## 20.1 Daftar Tabel Utama Sistem
 
-Versi MVP menggunakan 12 tabel utama:
+Sistem SADANA beroperasi menggunakan **11 tabel relasional utama** berikut:
 
-1. `users`
-2. `vaults`
-3. `vault_documents`
-4. `check_in_events`
-5. `trusted_witnesses`
-6. `release_recipients`
-7. `release_instructions`
-8. `trigger_events`
-9. `witness_decisions`
-10. `release_packages`
-11. `audit_logs`
-12. `notifications`
-
-Catatan: dashboard tidak membutuhkan tabel khusus karena datanya dihitung dari tabel yang sudah ada menggunakan query.
+1. `users`: Menyimpan kredensial otentikasi akun internal petugas posko.
+2. `victims`: Menyimpan data profil korban yang telah di-hash dan di-masking.
+3. `vouching_records`: Mencatat data histori penjaminan korban luar domisili / tanpa dokumen.
+4. `logistic_items`: Menyimpan daftar komoditas barang bantuan logistik kemanusiaan di gudang.
+5. `logistic_claims`: Mencatat log histori pemindaian klaim komoditas logistik harian korban.
+6. `diseases`: Master data klasifikasi jenis penyakit darurat krisis di posko lapangan.
+7. `triage_records`: Mencatat pengelompokan tingkat kegawatan pasien medis bencana.
+8. `medical_logs`: Menyimpan detail hasil pemeriksaan rekam medis darurat anonim oleh dokter.
+9. `medicines`: Menyimpan master data obat-obatan medis darurat di apotek posko.
+10. `medical_prescriptions`: Menghubungkan rekam medis dengan obat-obatan yang diserahkan ke korban.
+11. `system_keys`: Menyimpan data parameter enkripsi lokal yang dikunci di dalam memori RAM server.
 
 ---
 
-## 21.2 Tabel `users`
+## 20.2 Tabel `users`
 
-Menyimpan akun semua role.
-
-| Kolom | Tipe | Keterangan |
+| Nama Kolom | Tipe Data | Aturan / Keterangan |
 | --- | --- | --- |
-| UserId | uuid PK | ID user |
-| FullName | varchar | Nama lengkap atau alias |
-| Email | varchar unique | Email login |
-| PasswordHash | varchar | Password hash |
-| Role | varchar | VaultOwner/Witness/Recipient/Admin |
-| IsActive | boolean | Status akun |
-| CreatedAt | timestamp | Tanggal akun dibuat |
-| UpdatedAt | timestamp | Tanggal akun diperbarui |
+| UserId | int PK | Auto Increment |
+| Username | varchar(50) | Unik, digunakan untuk login petugas |
+| Password | varchar(255) | Terenkripsi menggunakan algoritma bcrypt |
+| Role | varchar(30) | Komandan / Registrasi / Logistik / Medis |
+| MacAddress | varchar(17) | Validasi fisik perangkat keras laptop petugas |
+| IsActive | bit | Status keaktifan akun petugas di lapangan |
 
----
+## 20.3 Tabel `victims`
 
-## 21.3 Tabel `vaults`
-
-Menyimpan data vault.
-
-| Kolom | Tipe | Keterangan |
+| Nama Kolom | Tipe Data | Aturan / Keterangan |
 | --- | --- | --- |
-| VaultId | uuid PK | ID vault |
-| OwnerId | uuid FK | Relasi ke users |
-| VaultName | varchar | Nama vault |
-| VaultStatus | varchar | Draft/Armed/GracePeriod/Triggered/Released/Disabled |
-| CheckInIntervalDays | int | Interval check-in |
-| GracePeriodHours | int | Durasi grace period |
-| LastCheckInAt | timestamp nullable | Waktu check-in terakhir |
-| NextCheckInDueAt | timestamp nullable | Deadline check-in berikutnya |
-| IsLowProfileMode | boolean | Status low-profile mode |
-| CreatedAt | timestamp | Tanggal dibuat |
-| UpdatedAt | timestamp | Tanggal diperbarui |
+| VictimId | int PK | Auto Increment |
+| QrTokenUuid | varchar(36) | Unik, token acak UUID v4 yang dicetak ke gelang |
+| NikHash | varchar(64) | Hasil enkripsi satu arah SHA-256 dari NIK korban |
+| MaskedName | varchar(10) | Nama inisial samaran korban (contoh: Korban_KS) |
+| EncryptedProfile | text | Data alamat dan telepon yang dienkripsi AES-256 |
+| RegistrationStatus | varchar(20) | Lokal / Luar_Domisili / Ditangguhkan |
+| CreatedAt | datetime | Waktu pendaftaran pertama di posko |
 
----
+## 20.4 Tabel `vouching_records`
 
-## 21.4 Tabel `vault_documents`
-
-Menyimpan metadata dokumen terenkripsi.
-
-| Kolom | Tipe | Keterangan |
+| Nama Kolom | Tipe Data | Aturan / Keterangan |
 | --- | --- | --- |
-| DocumentId | uuid PK | ID dokumen |
-| VaultId | uuid FK | Relasi ke vaults |
-| DisplayName | varchar | Nama file tampilan |
-| OriginalFileNameEncrypted | text nullable | Nama asli dalam bentuk terenkripsi |
-| BlobPath | text | Lokasi encrypted blob |
-| FileSizeBytes | bigint | Ukuran file |
-| MimeType | varchar | MIME type |
-| EncryptionAlgorithm | varchar | Contoh AES-256-GCM |
-| KeyDerivationHint | varchar nullable | Info derivasi tanpa secret |
-| DocumentStatus | varchar | Active/MarkedForRelease/Deleted |
-| CreatedAt | timestamp | Tanggal upload |
+| VouchId | int PK | Auto Increment |
+| VictimId | int FK | Berelasi ke tabel `victims` |
+| GuarantorName | varchar(100) | Nama lengkap warga lokal atau petugas penjamin |
+| GuarantorNikHash | varchar(64) | Hash KTP dari pihak yang memberikan jaminan |
+| VouchNotes | text | Alasan penjaminan (contoh: Turis, dokumen hilang) |
 
----
+## 20.5 Tabel `logistic_items`
 
-## 21.5 Tabel `check_in_events`
-
-Menyimpan riwayat check-in.
-
-| Kolom | Tipe | Keterangan |
+| Nama Kolom | Tipe Data | Aturan / Keterangan |
 | --- | --- | --- |
-| CheckInEventId | uuid PK | ID event |
-| VaultId | uuid FK | Relasi ke vaults |
-| CheckInAt | timestamp | Waktu check-in |
-| CheckInMethod | varchar | Manual/SystemDemo |
-| IpHash | varchar nullable | Hash IP untuk audit minimal |
-| UserAgentHash | varchar nullable | Hash user agent |
-| Notes | text nullable | Catatan opsional |
+| ItemId | int PK | Auto Increment |
+| ItemName | varchar(100) | Nama barang bantuan (contoh: Beras, Selimut, Air) |
+| Category | varchar(50) | Makanan / Pakaian / Tenda / Kebersihan |
+| CurrentStock | int | Kuantitas sisa stok riil di gudang posko |
+| MinimumThreshold | int | Batas minimum stok sebelum memicu alert sistem |
+| UnitType | varchar(20) | Satuan komoditas (KG / Dus / Pcs / Paket) |
 
----
+## 20.6 Tabel `logistic_claims`
 
-## 21.6 Tabel `trusted_witnesses`
-
-Menyimpan daftar witness untuk vault.
-
-| Kolom | Tipe | Keterangan |
+| Nama Kolom | Tipe Data | Aturan / Keterangan |
 | --- | --- | --- |
-| WitnessId | uuid PK | ID witness relation |
-| VaultId | uuid FK | Relasi ke vaults |
-| WitnessUserId | uuid FK nullable | Akun witness jika sudah terdaftar |
-| WitnessEmailEncrypted | text | Email witness terenkripsi |
-| WitnessAlias | varchar | Alias witness |
-| InvitationStatus | varchar | Pending/Accepted/Rejected/Revoked |
-| CreatedAt | timestamp | Tanggal dibuat |
-| AcceptedAt | timestamp nullable | Tanggal diterima |
+| ClaimId | int PK | Auto Increment |
+| VictimId | int FK | Berelasi ke tabel `victims` |
+| ItemId | int FK | Berelasi ke tabel `logistic_items` |
+| ClaimQuantity | int | Jumlah komoditas yang diserahkan ke korban |
+| ClaimedAt | datetime | Waktu pemindaian dan pengambilan bantuan |
+| OfficerUserId | int FK | Berelasi ke tabel `users` (Petugas Logistik) |
 
----
+## 20.7 Tabel `diseases`
 
-## 21.7 Tabel `release_recipients`
-
-Menyimpan penerima release.
-
-| Kolom | Tipe | Keterangan |
+| Nama Kolom | Tipe Data | Aturan / Keterangan |
 | --- | --- | --- |
-| RecipientId | uuid PK | ID recipient |
-| VaultId | uuid FK | Relasi ke vaults |
-| RecipientUserId | uuid FK nullable | Akun recipient jika ada |
-| RecipientEmailEncrypted | text | Email recipient terenkripsi |
-| RecipientAlias | varchar | Alias recipient |
-| DeliveryMethod | varchar | Email/SecureLink |
-| IsActive | boolean | Status recipient |
-| CreatedAt | timestamp | Tanggal dibuat |
+| DiseaseId | int PK | Auto Increment |
+| DiseaseCode | varchar(10) | Unik, Kode ICD-10 ringkas (contoh: DHF, ISPA) |
+| DiseaseName | varchar(100) | Nama penyakit dalam istilah kedokteran lapangan |
+| RiskLevel | varchar(20) | Rendah / Sedang / Tinggi / Menular Kritis |
 
----
+## 20.8 Tabel `triage_records`
 
-## 21.8 Tabel `release_instructions`
-
-Menyimpan instruksi release.
-
-| Kolom | Tipe | Keterangan |
+| Nama Kolom | Tipe Data | Aturan / Keterangan |
 | --- | --- | --- |
-| InstructionId | uuid PK | ID instruction |
-| VaultId | uuid FK | Relasi ke vaults |
-| InstructionTextEncrypted | text | Instruksi terenkripsi |
-| TriggerType | varchar | MissedCheckIn/Emergency |
-| WitnessThreshold | int | Jumlah witness approval yang dibutuhkan |
-| RequiredWitnessCount | int | Jumlah witness minimal |
-| IsActive | boolean | Status instruksi |
-| CreatedAt | timestamp | Tanggal dibuat |
-| UpdatedAt | timestamp | Tanggal diperbarui |
+| TriageId | int PK | Auto Increment |
+| ColorCode | varchar(15) | Merah (Kritis) / Kuning / Hijau / Hitam |
+| Description | text | Gejala klinis penentu keputusan klasifikasi |
 
----
+## 20.9 Tabel `medical_logs`
 
-## 21.9 Tabel `trigger_events`
-
-Menyimpan event trigger.
-
-| Kolom | Tipe | Keterangan |
+| Nama Kolom | Tipe Data | Aturan / Keterangan |
 | --- | --- | --- |
-| TriggerEventId | uuid PK | ID trigger |
-| VaultId | uuid FK | Relasi ke vaults |
-| TriggerType | varchar | MissedCheckIn/Emergency |
-| TriggerStatus | varchar | Created/AwaitingWitness/Approved/Rejected/Released/Cancelled |
-| TriggeredAt | timestamp | Waktu trigger |
-| Reason | text | Alasan trigger |
-| CreatedBy | uuid FK nullable | User/system pembuat |
+| MedicalLogId | int PK | Auto Increment |
+| VictimId | int FK | Berelasi ke tabel `victims` (Koneksi Anonim) |
+| TriageId | int FK | Berelasi ke tabel `triage_records` |
+| DiseaseId | int FK | Berelasi ke tabel `diseases` |
+| EncryptedClinicalNotes | text | Catatan medis darurat yang dienkripsi AES-256 |
+| ExaminedAt | datetime | Waktu pemeriksaan klinis di tenda medis |
+| DoctorUserId | int FK | Berelasi ke tabel `users` (Petugas Medis) |
 
----
+## 20.10 Tabel `medicines`
 
-## 21.10 Tabel `witness_decisions`
-
-Menyimpan keputusan witness.
-
-| Kolom | Tipe | Keterangan |
+| Nama Kolom | Tipe Data | Aturan / Keterangan |
 | --- | --- | --- |
-| DecisionId | uuid PK | ID keputusan |
-| TriggerEventId | uuid FK | Relasi ke trigger_events |
-| WitnessId | uuid FK | Relasi ke trusted_witnesses |
-| Decision | varchar | Confirm/Reject/Abstain |
-| DecisionNotesEncrypted | text nullable | Catatan witness terenkripsi |
-| DecidedAt | timestamp | Waktu keputusan |
+| MedicineId | int PK | Auto Increment |
+| MedicineName | varchar(100) | Nama obat-obatan darurat (contoh: Parasetamol) |
+| CurrentStock | int | Jumlah kuantitas stok butir/botol obat tersedia |
+| ExpiryDate | date | Tanggal kadaluwarsa obat lapangan |
 
----
+## 20.11 Tabel `medical_prescriptions`
 
-## 21.11 Tabel `release_packages`
-
-Menyimpan package rilis.
-
-| Kolom | Tipe | Keterangan |
+| Nama Kolom | Tipe Data | Aturan / Keterangan |
 | --- | --- | --- |
-| ReleasePackageId | uuid PK | ID package |
-| VaultId | uuid FK | Relasi ke vaults |
-| TriggerEventId | uuid FK nullable | Relasi ke trigger event |
-| PackageStatus | varchar | Draft/Armed/AwaitingWitness/Approved/Released/Cancelled |
-| ReleasedAt | timestamp nullable | Waktu rilis |
-| ReleaseTokenHash | varchar nullable | Hash token akses |
-| CreatedAt | timestamp | Tanggal dibuat |
-| UpdatedAt | timestamp | Tanggal diperbarui |
+| PrescriptionId | int PK | Auto Increment |
+| MedicalLogId | int FK | Berelasi ke tabel `medical_logs` |
+| MedicineId | int FK | Berelasi ke tabel `medicines` |
+| DispensedQty | int | Jumlah obat yang diberikan ke pasien |
+| DosageInstruction | varchar(100) | Aturan pakai darurat (contoh: 3x1 Sesudah Makan) |
 
----
+## 20.12 Tabel `system_keys`
 
-## 21.12 Tabel `audit_logs`
-
-Menyimpan log aktivitas.
-
-| Kolom | Tipe | Keterangan |
+| Nama Kolom | Tipe Data | Aturan / Keterangan |
 | --- | --- | --- |
-| AuditLogId | uuid PK | ID log |
-| UserId | uuid FK nullable | User pelaku |
-| VaultId | uuid FK nullable | Vault terkait |
-| Action | varchar | Nama aksi |
-| EntityName | varchar | Nama entitas |
-| EntityId | uuid nullable | ID entitas |
-| Description | text | Deskripsi aktivitas |
-| CreatedAt | timestamp | Tanggal aktivitas |
+| KeyId | int PK | Auto Increment |
+| KeyTokenCipher | text | Token kunci enkripsi utama yang dikunci sistem |
+| KeyStatus | varchar(20) | Aktif_Komando / Terhancurkan_Sadd |
 
 ---
 
-## 21.13 Tabel `notifications`
-
-Menyimpan notifikasi internal.
-
-| Kolom | Tipe | Keterangan |
-| --- | --- | --- |
-| NotificationId | uuid PK | ID notifikasi |
-| UserId | uuid FK | Penerima |
-| Title | varchar | Judul |
-| Message | text | Isi |
-| NotificationType | varchar | CheckIn/Witness/Release/System |
-| IsRead | boolean | Status baca |
-| CreatedAt | timestamp | Tanggal dibuat |
-
----
-
-# 22. ERD
+# 21. Entity Relationship Diagram (ERD)
 
 ```mermaid
 erDiagram
     USERS {
-        uuid UserId PK
-        string FullName
-        string Email
-        string PasswordHash
+        int UserId PK
+        string Username
+        string Password
         string Role
-        boolean IsActive
-        timestamp CreatedAt
-        timestamp UpdatedAt
+        string MacAddress
+        bool IsActive
     }
-
-    VAULTS {
-        uuid VaultId PK
-        uuid OwnerId FK
-        string VaultName
-        string VaultStatus
-        int CheckInIntervalDays
-        int GracePeriodHours
-        timestamp LastCheckInAt
-        timestamp NextCheckInDueAt
-        boolean IsLowProfileMode
-        timestamp CreatedAt
-        timestamp UpdatedAt
+    VICTIMS {
+        int VictimId PK
+        string QrTokenUuid
+        string NikHash
+        string MaskedName
+        string EncryptedProfile
+        string RegistrationStatus
+        datetime CreatedAt
     }
-
-    VAULT_DOCUMENTS {
-        uuid DocumentId PK
-        uuid VaultId FK
-        string DisplayName
-        string OriginalFileNameEncrypted
-        string BlobPath
-        bigint FileSizeBytes
-        string MimeType
-        string EncryptionAlgorithm
-        string KeyDerivationHint
-        string DocumentStatus
-        timestamp CreatedAt
+    VOUCHING_RECORDS {
+        int VouchId PK
+        int VictimId FK
+        string GuarantorName
+        string GuarantorNikHash
+        string VouchNotes
     }
-
-    CHECK_IN_EVENTS {
-        uuid CheckInEventId PK
-        uuid VaultId FK
-        timestamp CheckInAt
-        string CheckInMethod
-        string IpHash
-        string UserAgentHash
-        string Notes
+    LOGISTIC_ITEMS {
+        int ItemId PK
+        string ItemName
+        string Category
+        int CurrentStock
+        int MinimumThreshold
+        string UnitType
     }
-
-    TRUSTED_WITNESSES {
-        uuid WitnessId PK
-        uuid VaultId FK
-        uuid WitnessUserId FK
-        string WitnessEmailEncrypted
-        string WitnessAlias
-        string InvitationStatus
-        timestamp CreatedAt
-        timestamp AcceptedAt
+    LOGISTIC_CLAIMS {
+        int ClaimId PK
+        int VictimId FK
+        int ItemId FK
+        int ClaimQuantity
+        datetime ClaimedAt
+        int OfficerUserId FK
     }
-
-    RELEASE_RECIPIENTS {
-        uuid RecipientId PK
-        uuid VaultId FK
-        uuid RecipientUserId FK
-        string RecipientEmailEncrypted
-        string RecipientAlias
-        string DeliveryMethod
-        boolean IsActive
-        timestamp CreatedAt
+    DISEASES {
+        int DiseaseId PK
+        string DiseaseCode
+        string DiseaseName
+        string RiskLevel
     }
-
-    RELEASE_INSTRUCTIONS {
-        uuid InstructionId PK
-        uuid VaultId FK
-        string InstructionTextEncrypted
-        string TriggerType
-        int WitnessThreshold
-        int RequiredWitnessCount
-        boolean IsActive
-        timestamp CreatedAt
-        timestamp UpdatedAt
-    }
-
-    TRIGGER_EVENTS {
-        uuid TriggerEventId PK
-        uuid VaultId FK
-        string TriggerType
-        string TriggerStatus
-        timestamp TriggeredAt
-        string Reason
-        uuid CreatedBy FK
-    }
-
-    WITNESS_DECISIONS {
-        uuid DecisionId PK
-        uuid TriggerEventId FK
-        uuid WitnessId FK
-        string Decision
-        string DecisionNotesEncrypted
-        timestamp DecidedAt
-    }
-
-    RELEASE_PACKAGES {
-        uuid ReleasePackageId PK
-        uuid VaultId FK
-        uuid TriggerEventId FK
-        string PackageStatus
-        timestamp ReleasedAt
-        string ReleaseTokenHash
-        timestamp CreatedAt
-        timestamp UpdatedAt
-    }
-
-    AUDIT_LOGS {
-        uuid AuditLogId PK
-        uuid UserId FK
-        uuid VaultId FK
-        string Action
-        string EntityName
-        uuid EntityId
+    TRIAGE_RECORDS {
+        int TriageId PK
+        string ColorCode
         string Description
-        timestamp CreatedAt
+    }
+    MEDICAL_LOGS {
+        int MedicalLogId PK
+        int VictimId FK
+        int TriageId FK
+        int DiseaseId FK
+        string EncryptedClinicalNotes
+        datetime ExaminedAt
+        int DoctorUserId FK
+    }
+    MEDICINES {
+        int MedicineId PK
+        string MedicineName
+        int CurrentStock
+        date ExpiryDate
+    }
+    MEDICAL_PRESCRIPTIONS {
+        int PrescriptionId PK
+        int MedicalLogId FK
+        int MedicineId FK
+        int DispensedQty
+        string DosageInstruction
     }
 
-    NOTIFICATIONS {
-        uuid NotificationId PK
-        uuid UserId FK
-        string Title
-        string Message
-        string NotificationType
-        boolean IsRead
-        timestamp CreatedAt
+    USERS ||--o{ LOGISTIC_CLAIMS : processes
+    USERS ||--o{ MEDICAL_LOGS : examines
+    VICTIMS ||--o| VOUCHING_RECORDS : required_for
+    VICTIMS ||--o{ LOGISTIC_CLAIMS : receives
+    VICTIMS ||--o{ MEDICAL_LOGS : undergoes
+    LOGISTIC_ITEMS ||--o{ LOGISTIC_CLAIMS : included_in
+    TRIAGE_RECORDS ||--o{ MEDICAL_LOGS : categorizes
+    DISEASES ||--o{ MEDICAL_LOGS : standardizes
+    MEDICAL_LOGS ||--o{ MEDICAL_PRESCRIPTIONS : contains
+    MEDICINES ||--o{ MEDICAL_PRESCRIPTIONS : supplied_by
+
+```
+
+---
+
+# 22. Desain Berorientasi Objek (OOP Design)
+
+## 22.1 Encapsulation (Enkapsulasi)
+
+Seluruh kelas data model tidak diizinkan mengekspos variabel internalnya secara publik. Modifikasi data wajib melalui metode setter khusus yang divalidasi. Contoh: Kelas `Medicine` melundungi properti `CurrentStock` sehingga pengurangan stok akibat pemberian resep obat tidak bisa bernilai minus. Status enkripsi pada kelas `Victim` ditangani secara internal pada level siklus hidup enkapsulasi objek model sebelum operasi tulis basis data dipanggil.
+
+## 22.2 Inheritance (Pewarisan)
+
+Pewarisan struktur diimplementasikan untuk mengelola hak otentikasi pengguna sistem dan profil personil lapangan.
+
+### Sektor Kelas Akun Sistem:
+
+* `BaseUserAccount` (Abstract Class)
+* `CommandUserAccount` (Subclass Komandan Posko)
+* `RegistrationUserAccount` (Subclass Petugas Registrasi)
+* `LogisticUserAccount` (Subclass Petugas Logistik)
+* `MedicalUserAccount` (Subclass Petugas Medis)
+
+
+
+### Sektor Kelas Profil Kemanusiaan:
+
+* `HumanProfile` (Abstract Class)
+* `OfficerProfile` (Subclass Profil Lengkap Petugas)
+* `SecureVictimProfile` (Subclass Profil Aman Korban Terenkripsi)
+
+
+
+## 22.3 Polymorphism (Polimorfisme)
+
+Polimorfisme digunakan pada sistem otorisasi visual antarmuka dasbor. Method `RenderDashboardInterface()` yang dideklarasikan pada abstract class `BaseUserAccount` akan menghasilkan struktur menu navigasi, hak edit data, dan skema warna dasbor yang sepenuhnya berbeda pada masing-masing subclass petugas saat dipanggil oleh mesin rendering Laravel Livewire di lapangan.
+
+## 22.4 Abstraction (Abstraksi)
+
+Abstraksi diwujudkan melalui arsitektur pemisahan *Interface Service Layer* dan *Repository Pattern*. Kelas pengontrol UI tidak pernah tahu bagaimana logika database ditulis atau bagaimana data dienkripsi fisik. Pengontrol hanya berkomunikasi dengan interface abstrak seperti `ISecurityCryptoService`, `ILogisticManagementService`, dan `IMedicalEmergencyService`.
+
+---
+
+# 23. Daftar Class Utama Sistem
+
+## 23.1 BaseUserAccount (Abstract Class)
+
+* **Atribut:** `int id`, `string username`, `string role`, `string macAddress`, `bool isActive`
+* **Method:** `abstract public function RenderDashboardInterface()`, `public function ValidateDeviceBound()`
+
+## 23.2 SecureVictimProfile (Class)
+
+* **Atribut:** `string qrToken`, `string hashNik`, `string maskedName`, `string rawEncryptedBlob`
+* **Method:** `public function GenerateTokenWristband()`, `public function ApplyDataMasking()`, `public function DecryptProfileData(string $ramKey)`
+
+## 23.3 HighSecurityCryptoEngine (Class)
+
+* **Atribut:** `private $cipherAlgorithm`, `private $masterKeySystem`
+* **Method:** `public static function ComputeSha256(string $input)`, `public function EncryptSymetric(string $plaintext)`, `public function ExecuteCryptoShredding()`
+
+## 23.4 EmergencyMedicalUnit (Class)
+
+* **Atribut:** `int logId`, `string triageLevel`, `string clinicalDiagnosisCode`
+* **Method:** `public function AssignTriageColor()`, `public function AppendPrescription(int $medicineId, int $qty)`
+
+---
+
+# 24. Diagram Class
+
+```mermaid
+classDiagram
+    class BaseUserAccount {
+        <<abstract>>
+        +int id
+        +string username
+        +string role
+        +bool isActive
+        +ValidateDeviceBound() bool
+        +RenderDashboardInterface()* void
+    }
+    class CommandUserAccount {
+        +RenderDashboardInterface() void
+        +AuthorizeCloudSync() bool
+        +ExecuteShreddingTrigger() void
+    }
+    class RegistrationUserAccount {
+        +RenderDashboardInterface() void
+        +IssueNewWristband() object
+    }
+    class LogisticUserAccount {
+        +RenderDashboardInterface() void
+        +VerifyClaimStatus() bool
+    }
+    class MedicalUserAccount {
+        +RenderDashboardInterface() void
+        +AccessAlergyHistory() array
     }
 
-    USERS ||--o{ VAULTS : owns
-    VAULTS ||--o{ VAULT_DOCUMENTS : contains
-    VAULTS ||--o{ CHECK_IN_EVENTS : has
-    VAULTS ||--o{ TRUSTED_WITNESSES : has
-    USERS ||--o{ TRUSTED_WITNESSES : acts_as
-    VAULTS ||--o{ RELEASE_RECIPIENTS : has
-    USERS ||--o{ RELEASE_RECIPIENTS : receives_as
-    VAULTS ||--o{ RELEASE_INSTRUCTIONS : defines
-    VAULTS ||--o{ TRIGGER_EVENTS : creates
-    TRIGGER_EVENTS ||--o{ WITNESS_DECISIONS : requires
-    TRUSTED_WITNESSES ||--o{ WITNESS_DECISIONS : gives
-    VAULTS ||--o{ RELEASE_PACKAGES : produces
-    TRIGGER_EVENTS ||--o| RELEASE_PACKAGES : approves
-    USERS ||--o{ AUDIT_LOGS : performs
-    VAULTS ||--o{ AUDIT_LOGS : records
-    USERS ||--o{ NOTIFICATIONS : receives
+    class HumanProfile {
+        <<abstract>>
+        +string fullName
+        +string phoneNumber
+    }
+    class SecureVictimProfile {
+        +string qrTokenUuid
+        +string hashNik
+        +string maskedName
+        +ApplyDataMasking() void
+        +DecryptProfileData() string
+    }
+
+    class HighSecurityCryptoEngine {
+        -string cipherMethod
+        -string temporaryRamKey
+        +ComputeSha256(input) string
+        +EncryptSymetric(plaintext) string
+        +ExecuteCryptoShredding() void
+    }
+
+    BaseUserAccount <|-- CommandUserAccount
+    BaseUserAccount <|-- RegistrationUserAccount
+    BaseUserAccount <|-- LogisticUserAccount
+    BaseUserAccount <|-- MedicalUserAccount
+    HumanProfile <|-- SecureVictimProfile
+
 ```
 
 ---
 
-# 23. Desain Tampilan UI
+# 25. Diagram Sequence
 
-## 23.1 Konsep UI
+## 25.1 Sequence — Pemindaian & Otorisasi Klaim Logistik Bantuan
 
-Tampilan DeadDrop menggunakan konsep:
+```mermaid
+sequenceDiagram
+    autonumber
+    actor L as Petugas Logistik
+    participant V as View: DasborLogistik
+    participant S as Service: LogisticManagementService
+    participant R as Repo: VictimRepository
+    participant I as Repo: InventoryRepository
+    participant DB as Database Lokal
 
-* low-profile,
-* minimalis,
-* tidak mencolok,
-* aman,
-* fokus pada status,
-* mudah digunakan dalam kondisi stres,
-* menggunakan visual hierarchy yang jelas,
-* tidak menampilkan informasi sensitif secara berlebihan.
+    L->>V: Pindai Gelang QR Korban
+    V->>S: ProcessLogisticClaim(qrTokenUuid, itemId, qty)
+    S->>R: FindVictimByToken(qrTokenUuid)
+    R->>DB: SQL Query Token UUID
+    DB-->>R: Object Victim (Masked & Encrypted)
+    R-->>S: Victim Data Found
+    S->>S: Cek Duplikasi Klaim Hari Ini (Tabel claims)
+    alt Korban Sudah Mengambil Hari Ini
+        S-->>V: Return Error "Double Claim Detected!"
+        V-->>L: Bunyikan Alarm Merah Dasbor
+    else Kelayakan Klaim Valid (Belum Ambil)
+        S->>I: CheckStockSufficient(itemId, qty)
+        I->>DB: Query Stok Sisa Barang
+        DB-->>I: Kuantitas Stok Tersedia
+        alt Stok Gudang Cukup
+            I-->>S: Stok Valid
+            S->>I: ReduceStockValue(itemId, qty)
+            I->>DB: SQL Update Stock Inventory
+            S->>S: Log Histori ke Tabel claims
+            S-->>V: Return Success "Bantuan Siap Diserahkan"
+            V-->>L: Tampilkan Status Hijau Sukses
+        else Stok Gudang Kosong
+            I-->>S: Stok Kritis / Habis
+            S-->>V: Return Error "Stok Gudang Tidak Cukup"
+            V-->>L: Tampilkan Alert Peringatan Logistik
+        end
+    end
 
-## 23.2 Palet Warna
-
-| Elemen | Warna |
-| --- | --- |
-| Primary Dark | `#0B1020` |
-| Secondary Navy | `#172554` |
-| Accent Blue | `#2563EB` |
-| Safe Green | `#16A34A` |
-| Warning Amber | `#F59E0B` |
-| Danger Red | `#DC2626` |
-| Background | `#F8FAFC` |
-| Card | `#FFFFFF` |
-| Border | `#E2E8F0` |
-| Text Primary | `#0F172A` |
-| Text Secondary | `#64748B` |
-
-## 23.3 Warna Status
-
-| Status | Warna Tampilan |
-| --- | --- |
-| Draft | Abu-abu |
-| Armed | Hijau |
-| Safe | Hijau |
-| Deadline Soon | Kuning |
-| Grace Period | Oranye |
-| Triggered | Merah |
-| Awaiting Witness | Ungu |
-| Released | Biru |
-| Disabled | Abu-abu |
-
-## 23.4 Halaman Minimal untuk Prototype Figma
-
-Minimal 3 halaman utama:
-
-1. Landing Page Low-Profile.
-2. Dashboard Vault Owner.
-3. Vault Detail + Check-in Countdown.
-
-Rekomendasi halaman tambahan:
-
-4. Upload Document Flow.
-5. Witness Confirmation Page.
-6. Release Recipient Page.
-7. Audit Trail Page.
+```
 
 ---
 
-# 24. Rekomendasi Layout
+# 26. Diagram Status (State Diagram)
 
-## 24.1 Layout Landing Page
+## 26.1 Siklus Hidup Token QR Gelang Korban (Track III)
+
+```mermaid
+stateDiagram-v2
+    [*] --> MenungguVerifikasi : Data Diinput Registrasi
+    MenungguVerifikasi --> Aktif : Cetak QR Gelang Berhasil
+    Aktif --> Terklaim : Scan Logistik Berhasil (Siklus Harian)
+    Terklaim --> Aktif : Reset Parameter Waktu Hari Baru
+    Aktif --> Ditangguhkan : Gelang Dilaporkan Hilang/Rusak
+    Ditangguhkan --> Aktif : Gelang Ditemukan / Re-issue Token
+    Aktif --> Terhancurkan : Misi Selesai / Perintah Crypto-Shredding
+    Ditangguhkan --> Terhancurkan : Perintah Crypto-Shredding
+    Terklaim --> Terhancurkan : Perintah Crypto-Shredding
+    Terhancurkan --> [*]
+
+```
+
+---
+
+# 27. Struktur Arsitektur Proyek (Laravel Core Clean Stack)
+
+Struktur direktori proyek SADANA diatur secara terintegrasi menggunakan komponen berbasis Service-Repository agar memudahkan pengerjaan kolaborasi 2 orang dibantu AI Agent secara paralel:
 
 ```text
-+-------------------------------------------------------------+
-| DeadDrop                                      Login | Register |
-+-------------------------------------------------------------+
-| Hero: Secure continuity for sensitive evidence              |
-| Subtext: Private vault, scheduled check-in, trusted release  |
-| CTA: Create secure vault                                    |
-|-------------------------------------------------------------|
-| Problem: Evidence can disappear when people are silenced     |
-|-------------------------------------------------------------|
-| How it works: Encrypt -> Check-in -> Verify -> Release       |
-|-------------------------------------------------------------|
-| Security Cards: Client-side encryption | Witness threshold   |
-+-------------------------------------------------------------+
+SADANA/
+├── app/
+│   ├── Actions/
+│   │   └── Fortify/
+│   ├── Helpers/
+│   │   ├── CryptoHelper.php
+│   │   ├── NetworkMeshHelper.php
+│   │   └── TriageColorHelper.php
+│   ├── Http/
+│   │   ├── Controllers/
+│   │   │   └── LocalSyncController.php
+│   │   └── Livewire/
+│   │       ├── DashboardCommand.php
+│   │       ├── DashboardRegistration.php
+│   │       ├── DashboardLogistic.php
+│   │       ├── DashboardMedical.php
+│   │       ├── VictimRegistrationForm.php
+│   │       ├── LogisticScanner.php
+│   │       └── MedicalTriageUnit.php
+│   ├── Models/
+│   │   ├── User.php
+│   │   ├── Victim.php
+│   │   ├── VouchingRecord.php
+│   │   ├── LogisticItem.php
+│   │   ├── LogisticClaim.php
+│   │   ├── Disease.php
+│   │   ├── MedicalLog.php
+│   │   ├── Medicine.php
+│   │   └── Prescription.php
+│   ├── Repositories/
+│   │   ├── BaseRepositoryInterface.php
+│   │   ├── UserRepository.php
+│   │   ├── VictimRepository.php
+│   │   ├── LogisticRepository.php
+│   │   └── MedicalRepository.php
+│   └── Services/
+│       ├── SecurityCryptoService.php
+│       ├── LogisticManagementService.php
+│       └── MedicalEmergencyService.php
+├── database/
+│   ├── migrations/
+│   │   ├── 2026_06_01_000001_create_users_table.php
+│   │   ├── 2026_06_01_000002_create_victims_table.php
+│   │   ├── 2026_06_01_000003_create_vouching_records_table.php
+│   │   ├── 2026_06_01_000004_create_logistic_items_table.php
+│   │   ├── 2026_06_01_000005_create_logistic_claims_table.php
+│   │   └── 2026_06_01_000006_create_medical_logs_table.php
+│   └── seeders/
+├── info/
+│   └── GuideBook_Web_Development.pdf
+├── resources/
+│   └── views/
+│       ├── layouts/
+│       │   └── app.blade.php
+│       └── livewire/
+│           ├── dashboard-command.blade.php
+│           ├── dashboard-registration.blade.php
+│           ├── dashboard-logistic.blade.php
+│           ├── dashboard-medical.blade.php
+│           └── components/
+│               └── scan-alert-modal.blade.php
+├── routes/
+│   └── web.php
+└── tailwind.config.js
+
 ```
 
-## 24.2 Layout Dashboard Vault Owner
+---
+
+# 28. Desain Tampilan Antarmuka (UI Design)
+
+## 28.1 Palet Warna Keselamatan & Keamanan Posko
+
+Desain visual mengutamakan kejelasan tingkat tinggi (*high-contrast accessibility*) demi kenyamanan mata petugas di lapangan yang bekerja di bawah kondisi ekstrem.
+
+| Nama Elemen UI | Kode Hex Warna | Representasi Psikologis Visual |
+| --- | --- | --- |
+| **Primary Blue** | `#0B1E36` | Biru Navy Tua Komando: Tegas, Profesional, Resmi |
+| **Rescue Orange** | `#FF6B00` | Orange Rescue: Identitas Penyelamatan, Aksi Cepat |
+| **Light Alert Background** | `#F0F5FA` | Abu-Abu Putih Bersih: Nyaman Dibaca, Fokus Data |
+| **Card Panel Bright** | `#FFFFFF` | Putih Murni: Kontras Maksimal Terhadap Teks |
+| **Text Dark Core** | `#050F1A` | Hitam Gelap Pekat: Memudahkan Pembacaan Cepat |
+| **Text Secondary Muted** | `#526273` | Abu-Abu Redup: Keterangan Tambahan / Sub-Judul |
+
+## 28.2 Sistem Indikator Status Warna Triage Medis & Logistik
+
+| Kondisi Operasional Lapangan | Warna Badge Visual | Tampilan Hex Kode |
+| --- | --- | --- |
+| Status Aman / Klaim Valid / Triage Hijau | Hijau Sukses | `#10B981` |
+| Peringatan / Klaim Ganda Terdeteksi / Triage Kuning | Kuning Peringatan | `#F59E0B` |
+| Bahaya Kritis / Stok Habis / Triage Merah | Merah Darurat | `#EF4444` |
+| Token Ditangguhkan / Korban Meninggal (Triage Hitam) | Hitam Absolut | `#111827` |
+
+---
+
+# 29. Rekomendasi Layout Komponen Dasbor
+
+## 29.1 Tata Letak Dasbor Petugas Logistik (Tenda Pembagian Bansos)
 
 ```text
-+-------------------------------------------------------------+
-| DeadDrop | Dashboard                          [Owner Alias]  |
-+------------------+------------------------------------------+
-| Sidebar          | Card: Vault Status                        |
-| - Dashboard      | Card: Next Check-in                       |
-| - Vaults         | Card: Documents                           |
-| - Witnesses      | Card: Witness Active                      |
-| - Recipients     |------------------------------------------|
-| - Audit Log      | Countdown Check-in                        |
-|                  | [Check-in Now] [Emergency Release]        |
-|                  |------------------------------------------|
-|                  | Table: Recent Documents                   |
-|                  | Table: Recent Audit Logs                  |
-+------------------+------------------------------------------+
-```
++-----------------------------------------------------------------------------+
+| SADANA | OPERASIONAL LOGISTIK POSKO 01                   [Petugas: Budi_Log] |
++-----------------------+-----------------------------------------------------+
+| MENU NAVIGASI         | ZONA LIVE SCANNER WEBCAM (AKTIF)                     |
+| [*] Dasbor Utama      | +-------------------------------------------------+ |
+| [ ] Master Stok       | | [KAMERA SCANNER MEMINDAI TOKEN GELANG QR...]   | |
+| [ ] Log Klaim Harian  | +-------------------------------------------------+ |
+|                       | Status Deteksi Terakhir: [ KLAIM VALID - HIJAU ]    |
+|-----------------------+-----------------------------------------------------|
+| SUMMARY STOK GUDANG   | TABEL UTAMA HISTORI PENYERAHAN BANTUAN HARI INI     |
+| - Beras: 420 KG [Aman]| ID Token | Inisial Korban | Komoditas | Waktu Klaim |
+| - Air: 12 Dus  [KRITIS| #QR-0912 | Korban_AH      | Paket Semb| 13:14:02 WIB|
+| - Tenda: 5 Pcs  [Aman]| #QR-0841 | Korban_LM      | Selimut   | 13:10:55 WIB|
++-----------------------+-----------------------------------------------------+
 
-## 24.3 Layout Vault Detail
-
-```text
-+-------------------------------------------------------------+
-| Vault: Project Orion Evidence               Status: Armed   |
-| Next Check-in: 3 days 04 hours                              |
-|-------------------------------------------------------------|
-| Check-in Panel                                               |
-| [Check-in Now] [Change Interval] [Emergency Release Now]     |
-|-------------------------------------------------------------|
-| Documents                                                   |
-| Name | Size | Status | Uploaded At | Action                  |
-|-------------------------------------------------------------|
-| Witness Network                                             |
-| Alias | Status | Last Decision                                |
-|-------------------------------------------------------------|
-| Release Instruction                                         |
-| Trigger | Threshold | Recipients | Status                      |
-+-------------------------------------------------------------+
-```
-
-## 24.4 Layout Witness Confirmation
-
-```text
-+-------------------------------------------------------------+
-| Witness Confirmation Request                                |
-| Vault Alias: Case Archive 01                                |
-| Trigger: Missed check-in                                    |
-| Deadline: 12 hours remaining                                |
-|-------------------------------------------------------------|
-| Context Summary                                             |
-| Owner has missed check-in after grace period                 |
-|-------------------------------------------------------------|
-| [Confirm Release] [Reject Release] [Need More Time]          |
-| Notes field                                                 |
-+-------------------------------------------------------------+
 ```
 
 ---
 
-# 25. Ide Copywriting Utama
+# 30. Query Data Dasbor yang Disarankan (Eloquent Pseudocode)
 
-## 25.1 Headline
+Untuk memastikan performa aplikasi web berjalan ringan di server portabel berspesifikasi rendah, query analitik menggunakan agregasi efisien:
 
-**Evidence should not disappear when people do.**
+## 30.1 Perhitungan Metrik Ringkas Dasbor Komandan
 
-## 25.2 Subheadline
+```php
+// Menghitung jumlah korban berhak menerima bansos hari ini tanpa mengekspos data pribadi
+$totalKorbanTerdata = Victim::where('registration_status', '!=', 'Ditangguhkan')->count();
 
-DeadDrop helps at-risk journalists, human rights workers, and whistleblowers protect sensitive evidence through encrypted vaults, scheduled check-ins, and trusted release verification.
+// Alert stok logistik kritis di bawah batas ambang minimum
+$itemKritisAlert = LogisticItem::whereRaw('current_stock <= minimum_threshold')->get();
 
-## 25.3 Value Proposition
+// Menghitung grafik tren infeksi penyakit menular tertinggi di posko medis harian
+$trenPenyakit = MedicalLog::select('disease_id', DB::raw('count(*) as total'))
+    ->whereDate('examined_at', Carbon::today())
+    ->groupBy('disease_id')
+    ->orderBy('total', 'desc')
+    ->take(5)
+    ->get();
 
-* Encrypt before upload.
-* Check in before the deadline.
-* Let trusted witnesses verify emergencies.
-* Release only when conditions are met.
-* Keep servers blind to sensitive content.
+```
 
----
+## 30.2 Pencegahan Klaim Ganda pada Controller Pos Logistik
 
-# 26. Risiko dan Solusi
+```php
+public function verifyAndProcessClaim($scannedToken, $requestedItemId, $officerId)
+{
+    $victim = Victim::where('qr_token_uuid', $scannedToken)->first();
+    
+    if (!$victim) {
+        return response()->json(['status' => 'ERROR', 'message' => 'Token Tidak Dikenali!']);
+    }
 
-## 26.1 Risiko
+    // Query mengecek apakah token ini sudah mengambil jenis barang yang sama hari ini
+    $alreadyClaimed = LogisticClaim::where('victim_id', $victim->id)
+        ->where('item_id', $requestedItemId)
+        ->whereDate('claimed_at', Carbon::today())
+        ->exists();
 
-* False trigger dapat merilis dokumen terlalu cepat.
-* Pengguna lupa check-in.
-* Witness tidak merespons tepat waktu.
-* Implementasi kriptografi terlalu kompleks untuk MVP.
-* Ide dapat dianggap sensitif secara etis jika tidak dijelaskan dengan hati-hati.
-* Penerima release dapat menyalahgunakan dokumen.
-* Server tetap menyimpan metadata yang bisa berisiko.
+    if ($alreadyClaimed) {
+        return response()->json(['status' => 'WARNING', 'message' => 'Double Claim Terdeteksi!']);
+    }
 
-## 26.2 Solusi
+    // Eksekusi pemotongan stok jika lolos validasi klaim ganda
+    return DB::transaction(function () use ($victim, $requestedItemId, $officerId) {
+        $item = LogisticItem::lockForUpdate()->find($requestedItemId);
+        $item->decrement('current_stock', 1);
 
-* Gunakan grace period sebelum trigger.
-* Gunakan witness threshold.
-* Kirim reminder sebelum deadline.
-* MVP menggunakan enkripsi client-side sederhana dan menjelaskan desain kriptografi lanjutan sebagai roadmap.
-* Tambahkan ethical use policy.
-* Release hanya ke recipient yang sudah ditentukan, bukan publik otomatis.
-* Terapkan metadata minimization.
-* Jelaskan bahwa admin tidak bisa membaca isi dokumen.
-* Gunakan audit trail untuk transparansi status.
+        LogisticClaim::create([
+            'victim_id' => $victim->id,
+            'item_id' => $requestedItemId,
+            'claim_quantity' => 1,
+            'claimed_at' => Carbon::now(),
+            'officer_user_id' => $officerId
+        ]);
 
----
+        return response()->json(['status' => 'SUCCESS', 'message' => 'Klaim Berhasil Disimpan.']);
+    });
+}
 
-# 27. Rencana Implementasi MVP 12 Jam
-
-## 27.1 Prioritas Utama
-
-1. Setup project Next.js.
-2. Setup database.
-3. Buat login sederhana.
-4. Buat dashboard Vault Owner.
-5. Buat create vault.
-6. Buat upload dokumen dan client-side encryption.
-7. Simpan encrypted blob.
-8. Buat check-in timer.
-9. Buat witness dan recipient management sederhana.
-10. Buat trigger missed check-in simulasi.
-11. Buat witness confirmation.
-12. Buat release notification simulasi/email.
-13. Buat audit log.
-14. Polishing UI.
-
-## 27.2 Pembagian Waktu
-
-| Waktu | Fokus |
-| --- | --- |
-| Jam 1 | Setup project, routing, layout |
-| Jam 2 | Database schema dan seed data |
-| Jam 3 | Auth sederhana dan role guard |
-| Jam 4 | Dashboard Vault Owner |
-| Jam 5 | CRUD vault dan setting check-in |
-| Jam 6 | Upload file dan WebCrypto encryption |
-| Jam 7 | Document list dan metadata |
-| Jam 8 | Witness dan recipient management |
-| Jam 9 | Check-in timer dan status vault |
-| Jam 10 | Trigger simulation dan witness confirmation |
-| Jam 11 | Release package dan audit log |
-| Jam 12 | UI polish, responsive, demo flow |
+```
 
 ---
 
-# 28. Acceptance Criteria
+# 31. Pembagian Tugas Kelompok (2 Orang + AI Agent)
 
-## 28.1 Landing Page
+## 31.1 Anggota Tim 1 — Core Architect, Security & Back-End Engine
 
-* User dapat membuka landing page.
-* Informasi konsep DeadDrop tampil jelas.
-* Tombol login/register tersedia.
+* **Fokus Kerja:**
+* Inisialisasi framework Laravel, setup struktur database, dan penulisan file migrasi tabel relasional.
+* Implementasi sistem keamanan kriptografi: Algoritma hash SHA-256 untuk NIK dan enkripsi AES-256 pada `SecurityCryptoService`.
+* Merekayasa logika anti-klaim ganda memanfaatkan transaksi database aman (`DB::transaction`).
+* Membangun fungsi destruktif *Crypto-Shredding Engine* pada kontrol utama admin.
 
-## 28.2 Login
 
-* User dapat login dengan akun valid.
-* User diarahkan ke dashboard sesuai role.
-* User tidak dapat mengakses halaman role lain.
+* **Tanggung Jawab File Model & Service:** `User.php`, `Victim.php`, `VouchingRecord.php`, `SecurityCryptoService.php`.
 
-## 28.3 Vault
+## 31.2 Anggota Tim 2 — UI/UX Master, Front-End & Livewire Scanner
 
-* Vault Owner dapat membuat vault.
-* Vault Owner dapat mengatur interval check-in.
-* Status vault tampil jelas.
+* **Fokus Kerja:**
+* Konfigurasi framework Tailwind CSS sesuai dengan palet warna *High-Contrast Safety*.
+* Slicing layout antarmuka visual komponen dasbor berdasarkan variasi role petugas kemanusiaan.
+* Mengintegrasikan library Javascript kamera scanner untuk membaca QR Code gelang korban secara langsung di halaman browser.
+* Membangun komponen form input pendaftaran korban krisis yang dinamis menggunakan Laravel Livewire.
+* Menampilkan notifikasi modal darurat (*Alert Popup Animations*) jika sistem mendeteksi kegagalan stok atau indikasi klaim kecurangan ganda.
 
-## 28.4 Dokumen
 
-* Vault Owner dapat upload file.
-* File dienkripsi di browser sebelum dikirim.
-* Server menyimpan encrypted blob dan metadata.
-* Dokumen tampil di daftar vault.
-
-## 28.5 Check-in
-
-* Countdown check-in tampil.
-* Vault Owner dapat melakukan check-in.
-* Sistem memperbarui next deadline.
-* Audit log mencatat check-in.
-
-## 28.6 Trigger dan Witness
-
-* Sistem dapat mensimulasikan missed check-in.
-* Witness dapat memberi keputusan confirm/reject.
-* Sistem menghitung threshold approval.
-* Status release berubah sesuai keputusan.
-
-## 28.7 Release Package
-
-* Release package dapat berubah menjadi Released jika syarat terpenuhi.
-* Recipient dapat melihat release package setelah status valid.
-* Audit log mencatat release.
+* **Tanggung Jawab Komponen Presentasi:** `layouts/app.blade.php`, `dashboard-logistic.blade.php`, `MedicalTriageUnit.php`, `UiHelper.php`.
 
 ---
 
-# 29. Keunggulan Ide untuk Proposal
+# 32. Skenario Jalannya Demo Presentasi Juri FIT Competition 2026
 
-DeadDrop kuat untuk proposal karena:
+Untuk memikat dewan juri secara maksimal, demo aplikasi dipresentasikan melalui alur skenario operasional lapangan end-to-end berikut:
 
-1. Masalahnya spesifik dan tidak generik.
-2. Relevan dengan Track III tentang privasi, identitas, dan keamanan data.
-3. Memiliki novelty tinggi melalui kombinasi dead man’s switch, client-side encryption, dan trusted witness threshold.
-4. Berbeda dari cloud storage, notes app, atau secure drive biasa.
-5. Punya konteks kemanusiaan yang jelas: jurnalis, aktivis HAM, whistleblower, dan pekerja krisis.
-6. MVP tetap realistis untuk dibuat dalam 12 jam.
-7. UI/UX bisa dibuat kuat karena fokus pada dashboard, countdown, status, dan emergency flow.
-8. Database berelasi jelas.
-9. Arsitektur secure-by-design dapat dijelaskan dengan baik.
-10. Risiko dan etika bisa dibahas matang sehingga proposal terlihat dewasa.
+1. **Simulasi Krisis & Registrasi Korban:** Anggota Tim 2 bertindak sebagai korban dari luar daerah yang kehilangan KTP. Anggota Tim 1 (sebagai petugas) mendatanya melalui menu *Vouching System* dengan jaminan ID warga lokal. Juri diperlihatkan layar *back-end* database tempat nomor identitas terbukti langsung berubah menjadi deretan kode hash terenkripsi aman (SHA-256).
+2. **Penerbitan Token Fisik:** Sistem sukses memproses pendaftaran dan mencetak QR Code unik pada layar dasbor (mensimulasikan pencetakan gelang fisik).
+3. **Uji Coba Distribusi & Deteksi Kecurangan (Double Claim):** Token QR tersebut kemudian dipindai di Dasbor Logistik untuk mencairkan bantuan sembako. Proses pertama berhasil dan stok gudang terpotong otomatis. Petugas langsung mencoba memindai ulang token yang sama untuk kedua kalinya. Sistem dengan cepat menolak klaim tersebut dan membunyikan alarm visual kuning di hadapan juri, membuktikan keandalan fitur proteksi kecurangan.
+4. **Pelayanan Medis Anonim:** Token yang sama dibawa ke tenda medis. Dasbor dokter terbuka, menampilkan riwayat alergi obat darurat secara anonim tanpa membuka data nama asli korban, demi membuktikan kepatuhan terhadap regulasi privasi data kemanusiaan.
+5. **Simulasi Akhir Misi (Crypto-Shredding Trigger):** Komandan Posko masuk ke sistem, lalu mengeksekusi fitur penghancuran data darurat. Aplikasi seketika terkunci dan seluruh baris data sensitif di database terbukti rusak total menjadi karakter acak yang tidak bisa dibaca lagi, menutup sesi presentasi dengan pembuktian kepatuhan total perlindungan data.
 
 ---
 
-# 30. Kesimpulan
+# 33. Analisis Risiko Teknis & Solusi Lapangan
 
-DeadDrop adalah ide website yang kuat untuk FIT Competition 2026 karena menggabungkan keamanan digital, perlindungan bukti, respons kemanusiaan, dan privasi data dalam satu solusi yang fokus.
+## 33.1 Risiko 1: Gangguan Listrik Padam Tiba-Tiba saat Penulisan Data
 
-Nilai utama DeadDrop bukan hanya menyimpan dokumen, tetapi memastikan dokumen penting tetap memiliki jalur aman untuk sampai ke pihak tepercaya ketika pemiliknya berada dalam risiko. Dengan client-side encryption, check-in mechanism, trusted witness network, dan release instruction, DeadDrop menjadi solusi website yang relevan, inovatif, dan realistis untuk Track III — Eksploitasi Identitas dan Data.
+* **Dampak Kebencanaan:** Database lokal berpotensi mengalami kerusakan file (*Data Corruption*) jika laptop server posko mati mendadak saat proses pengoperasian tulis SQL.
+* **Solusi SADANA:** Mengonfigurasi database engine PostgreSQL dengan fitur *Write-Ahead Logging* (WAL) aktif, serta mewajibkan implementasi arsitektur UPS/Baterai cadangan internal laptop server terjaga pada level performa optimal selama krisis.
 
-Untuk babak final, MVP dapat difokuskan pada upload terenkripsi, check-in timer, trigger simulasi, witness approval, dan release notification. Dengan scope tersebut, DeadDrop tetap feasible dibuat dalam 12 jam tetapi terlihat kuat secara konsep, teknis, dan dampak kemanusiaan.
+## 33.2 Risiko 2: Kunci Enkripsi Master Terbaca Oknum yang Mencuri Laptop Petugas
+
+* **Dampak Kebencanaan:** Enkripsi database AES-256 menjadi tidak berguna jika kunci pembukanya ikut tersimpan secara statis di laptop lapangan yang hilang dicuri.
+* **Solusi SADANA:** Mengimplementasikan konsep *RAM-Only Key Deployment*. Kunci enkripsi utama wajib diinput manual oleh Komandan melalui flashdisk fisik terpisah saat pertama kali menyalakan server lokal. Jika laptop dimatikan secara paksa atau dicuri, pasokan listrik RAM terputus, kunci hilang dari memori secara otomatis, dan database mengunci diri secara absolut.
+
+---
+
+# 34. Strategi Rekomendasi Implementasi Bertahap (Sprint Execution)
+
+Guna memastikan proyek selesai tepat waktu dalam target pengerjaan cepat bersama AI Agent, ikuti panduan urutan kerja taktis berikut:
+
+1. **Fase 1 (Jam 01 - 02):** Setup struktur database lokal, pembuatan tabel migrasi relasional, dan pengujian konektivitas driver basis data lokal.
+2. **Fase 2 (Jam 02 - 04):** Penulisan logika enkripsi dasar satu arah pada `SecurityCryptoService` dan validasi login multi-role akun petugas.
+3. **Fase 3 (Jam 04 - 07):** Slicing antarmuka visual Tailwind CSS untuk halaman registrasi korban, modul scanner logistik, dan dasbor medis. Integrasi fungsi Javascript pembaca kode QR.
+4. **Fase 4 (Jam 07 - 09):** Penggabungan modul back-end dengan tampilan UI Livewire. Pengujian penguncian data klaim ganda dan sinkronisasi log harian.
+5. **Fase 5 (Jam 09 - 10):** Pembuatan tombol pintas fungsi darurat *Crypto-Shredding*, pembersihan sisa *bug* kode, dan simulasi demo presentasi akhir.
+
+---
+
+# 35. Kesimpulan
+
+SADANA dirancang sebagai representasi inovasi teknologi digital yang humanis, tangguh, dan aman untuk menjawab tantangan tata kelola kemanusiaan di area krisis. Melalui integrasi arsitektur *Offline-First* dan proteksi *Secure-by-Design*, platform ini membuktikan bahwa efisiensi distribusi bantuan logistik skala masif dapat dicapai tanpa harus mengorbankan hak privasi dan keamanan identitas para korban bencana yang berada dalam kondisi rentan.
+
+Dengan struktur kode yang bersih, pembagian kerja tim yang taktis bersama AI Agent, serta skenario pembuktian fitur kriptografi yang kuat, SADANA siap menjadi solusi perangkat lunak yang sangat kompetitif untuk menaklukkan puncak kejayaan pada kategori **Web Development FIT Competition 2026**.
