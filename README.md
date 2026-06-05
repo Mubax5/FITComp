@@ -1,9 +1,9 @@
 # PRD — Sistem Aman Distribusi Bantuan dan Manajemen Bencana (SADANA)
 
-**Platform:** Web Application (Responsive Dashboard) menggunakan Laravel 11 + Tailwind CSS + Livewire
-**Database:** PostgreSQL / MySQL (Local Server Portable & Cloud Sync Stack)
-**Tema UI:** High-Contrast Safety (Biru Tua Komando, Orange Penyelamatan, Putih Bersih, dan Hijau Indikator)
-**Role:** Komandan Posko (Admin), Petugas Registrasi, Petugas Logistik, Petugas Medis
+**Platform:** Web Application (Responsive Dashboard) menggunakan Next.js (App Router) + Tailwind CSS + Context API </br>
+**Database:** SQLite (Local Server Portable / Single-File Engine) menggunakan Prisma ORM </br>
+**Tema UI:** High-Contrast Safety (Biru Tua Komando, Orange Penyelamatan, Putih Bersih, dan Hijau Indikator) </br>
+**Role:** Komandan Posko (Admin), Petugas Registrasi, Petugas Logistik, Petugas Medis </br>
 
 ---
 
@@ -20,10 +20,11 @@ SADANA adalah platform manajemen operasional penanggulangan bencana berbasis web
 ## 1.3 Tujuan Utama
 
 Meningkatkan efisiensi dan keamanan tata kelola posko bencana melalui implementasi:
-1. **Registrasi Anonim Berbasis Kriptografi:** Petugas registrasi mendata korban menggunakan NIK/IKD/Paspor yang langsung diubah menjadi hash unik sekali pakai (SHA-256) guna meminimalkan risiko eksploitasi identitas.
+
+1. **Registrasi Anonim Berbasis Kriptografi:** Petugas registrasi mendata korban menggunakan NIK/IKD/Paspor yang langsung diubah menjadi hash unik sekali pakai menggunakan fungsi satu arah agar meminimalkan risiko eksploitasi identitas.
 2. **Identifikasi Berbasis Token Fisik (QR Wristband):** Korban mendapatkan gelang identitas QR Code yang berfungsi sebagai kunci otorisasi anonim untuk mengklaim logistik bantuan dan layanan medis harian.
 3. **Pemisahan Hak Akses Ketat (RBAC):** Petugas logistik hanya dapat melihat kelayakan klaim bantuan, sedangkan petugas medis hanya memiliki akses ke rekam medis darurat tanpa mengetahui identitas asli korban.
-4. **Mekanisme Pasca-Bencana Aman (Crypto-Shredding):** Sistem menyediakan fitur penghancuran kunci enkripsi (*Master Key*) secara instan setelah masa tanggap darurat selesai untuk memastikan tidak ada jejak digital data sensitif yang tertinggal pada perangkat lokal lapangan.
+4. **Mekanisme Pasca-Bencana Aman (Crypto-Shredding):** Sistem menyediakan fitur penghancuran kunci enkripsi secara instan setelah masa tanggap darurat selesai untuk memastikan tidak ada jejak digital data sensitif yang tertinggal pada perangkat lokal lapangan.
 5. **Arsitektur Jaringan Tangguh (Offline-First):** Memastikan sistem dapat bekerja 100% menggunakan server lokal portabel (seperti laptop utama atau Raspberry Pi) yang dihubungkan melalui router Wi-Fi lokal di area bencana tanpa koneksi internet.
 
 ---
@@ -34,13 +35,14 @@ Pada situasi darurat pascabencana alam atau krisis kemanusiaan, alur birokrasi d
 
 Kondisi tersebut menciptakan celah eksploitasi data yang sangat masif bagi oknum tidak bertanggung jawab. Kasus pencurian identitas (*identity theft*) terhadap korban bencana untuk keperluan pengajuan pinjaman online (pinjol) ilegal, pemerasan, hingga penipuan terstruktur marak terjadi karena minimnya pengamanan data pada sektor akar rumput kemanusiaan.
 
-Di sisi lain, tantangan infrastruktur di area bencana seperti putusnya aliran listrik dan hilangnya sinyal telekomunikasi membuat aplikasi berbasis *cloud server* konvensional sama sekali tidak dapat diandalkan. Oleh karena itu, SADANA hadir sebagai solusi platform manajemen internal posko bencana yang menggabungkan kecepatan operasional lapangan, ketangguhan *offline*, dan proteksi enkripsi data tingkat tinggi untuk menjamin bantuan sampai ke tangan yang tepat tanpa mengorbankan privasi para korban.
+Di sisi lain, tantangan infrastruktur di area bencana seperti putusnya aliran listrik dan hilangnya sinyal telekomunikasi membuat aplikasi berbasis *cloud server* konvensional sama sekali tidak dapat diandalkan. Oleh karena itu, SADANA hadir menggunakan ekosistem Next.js sebagai solusi platform manajemen internal posko bencana yang menggabungkan kecepatan operasional lapangan, ketangguhan *offline*, dan proteksi enkripsi data tingkat tinggi untuk menjamin bantuan sampai ke tangan yang tepat tanpa mengorbankan privasi para korban.
 
 ---
 
 # 3. Visi Produk
 
 Menyediakan sistem informasi internal penanggulangan bencana yang:
+
 * **Zero-Trust Data Protection:** Mengutamakan privasi korban melalui metode enkripsi end-to-end, minimalisasi data, dan pemisahan role petugas secara absolut.
 * **Disaster-Ready Architecture:** Mampu beroperasi secara instan di area minim infrastruktur menggunakan pendekatan *Offline-First* berbasis jaringan lokal.
 * **High-Speed Operations:** Mengurangi antrean fisik posko melalui integrasi pemindaian QR Code yang cepat.
@@ -51,199 +53,314 @@ Menyediakan sistem informasi internal penanggulangan bencana yang:
 # 4. Tujuan Produk
 
 ## 4.1 Tujuan Operasional
+
 * Mempercepat proses pendataan korban di posko darurat menggunakan metode digital terenkripsi.
-* Menyediakan fitur *vouching* (penjaminan) terstruktur untuk memvalidasi korban luar domisili (turis/tamu) tanpa mengabaikan aspek akuntabilitas.
+* Menyediakan fitur *vouching* (penjaminan) terstruktur untuk memvalidasi korban luar domisili atau tanpa identitas (turis/tamu/korban hanyut) tanpa mengabaikan aspek akuntabilitas.
 * Mencegah terjadinya duplikasi klaim bantuan sosial harian melalui pencatatan transaksi berbasis token QR tunggal.
 * Memfasilitasi pelayanan medis darurat yang cepat dengan integrasi rekam medis anonim.
 * Memberikan visualisasi data agregat (grafik logistik dan statistik kesehatan) kepada Komandan Posko untuk mempermudah pengambilan keputusan taktis tanpa mengekspos data pribadi korban.
 
 ## 4.2 Tujuan Akademik
+
 Menunjukkan keahlian tim dalam merekayasa perangkat lunak modern yang menerapkan prinsip:
+
 * **Encapsulation:** Mengunci properti sensitif seperti kunci enkripsi melalui enkapsulasi class yang ketat.
-* **Inheritance:** Mengatur variasi role petugas dan profil pengguna melalui hierarki kelas yang bersih.
-* **Polymorphic Authorization:** Menentukan fungsionalitas menu dasbor secara dinamis berdasarkan tipe *subclass* user yang aktif.
-* **Abstraction & Clean Architecture:** Memisahkan logika enkripsi data kemanusiaan dari lapisan presentasi UI dengan menggunakan *Pattern Service* dan *Repository*.
+* **Inheritance:** Mengatur variasi role petugas dan profil pengguna melalui hierarki kelas yang bersih atau padanan fungsionalnya dalam Next.js Context/Middleware.
+* **Polymorphic Authorization:** Menentukan fungsionalitas menu dasbor secara dinamis berdasarkan payload role yang aktif.
+* **Abstraction & Clean Architecture:** Memisahkan logika enkripsi data kemanusiaan dari lapisan presentasi UI dengan menggunakan *Pattern Service*, *Repository*, atau *Server Actions* Next.js.
 
 ---
 
 # 5. Ruang Lingkup Sistem
 
 ## 5.1 Yang Termasuk dalam Sistem
-1. Otentikasi dan login multi-role untuk petugas internal posko.
-2. Dasbor analitik real-time yang disesuaikan berdasarkan hak akses role petugas.
-3. Modul registrasi korban (Input data identitas primer -> hashing otomatis -> konversi ke token QR).
-4. Modul manajemen penjaminan (*Vouching System*) bagi warga non-domisili / turis menggunakan akun verifikator lokal (RT/RW/Pengelola).
-5. Modul distribusi logistik (Scan QR -> validasi kelayakan klaim harian -> potong stok barang otomatis).
-6. Modul penanganan medis (Scan QR -> pemeriksaan klinis darurat/triage -> rekam medis anonim).
-7. Master data barang logistik bantuan (stok, kategori, ambang batas minimum).
-8. Master data klasifikasi penyakit darurat untuk mempermudah input dokter.
-9. Fitur penangguhan/revokasi token QR gelang yang dilaporkan hilang.
-10. Fitur simulasi sinkronisasi data lokal-ke-cloud (*Local-to-Cloud Database Synchronization*) saat internet tersedia.
-11. Fitur *Crypto-Shredding* (Penghancuran Master Key) via interaksi dasbor Komandan Posko untuk menghapus kemampuan dekripsi basis data lokal.
+
+1. Registrasi akun petugas lapangan oleh Komandan Posko.
+2. Login multi-role dengan validasi MAC Address lokal perangkat.
+3. Dashboard fungsional berdasarkan role (Komandan, Registrasi, Logistik, Medis).
+4. Manajemen akun petugas lapangan oleh Komandan Posko.
+5. Pendaftaran korban regular (menggunakan NIK/IKD) dan korban darurat tanpa dokumen (menggunakan skema penjaminan saksi warga lokal).
+6. Modul penjaminan (*Vouching System*) korban luar domisili / tanpa dokumen.
+7. Modul distribusi logistik (Scan QR -> validasi kelayakan klaim harian -> potong stok barang otomatis).
+8. Modul penanganan medis (Scan QR -> pemeriksaan klinis darurat/triage -> rekam medis anonim).
+9. Master data barang logistik bantuan (stok, kategori, ambang batas minimum).
+10. Master data klasifikasi penyakit darurat posko (ICD-10 sederhana).
+11. Master data obat-obatan apotek darurat posko.
+12. Fitur resep atau pemberian obat darurat oleh petugas medis.
+13. Fitur penangguhan/revokasi token QR gelang yang dilaporkan hilang.
+14. Fitur simulasi sinkronisasi data lokal-ke-cloud ketika koneksi pulih.
+15. Fitur *Mnemonic Phrase Recovery* (pemulihan gelang hilang menggunakan 3 kata kunci).
+16. Fitur *Crypto-Shredding* (Penghancuran Master Key) di memori RAM server Next.js.
+17. Fitur *Client-Side Canvas Pixelate* untuk pengubahan foto wajah menjadi mosaik siluet abstrak.
 
 ## 5.2 Yang Tidak Termasuk dalam Sistem
-1. Aplikasi komersial untuk masyarakat umum / korban (aplikasi murni bersifat internal operasional).
-2. Sistem e-commerce pembelanjaan barang bansos.
-3. Integrasi sistem pembayaran bank atau dompet digital.
-4. Pengiriman notifikasi SMS/WhatsApp ke nomor pribadi korban (guna menjaga kerahasiaan nomor telepon).
-5. Fitur pelacakan lokasi GPS korban secara real-time (anti-surveillance).
-6. Manajemen multi-cabang posko lintas negara yang kompleks.
+
+1. Pembayaran keuangan online atau pencairan BLT tunai secara langsung.
+2. Integrasi BPJS atau sistem rujukan rumah sakit besar luar daerah.
+3. Integrasi laboratorium klinis kompleks.
+4. Notifikasi WhatsApp/SMS publik (demi mencegah pelacakan posisi korban).
+5. Tanda tangan digital bersertifikasi nasional.
+6. Multi-cabang posko lintas negara yang kompleks.
+7. Aplikasi mobile native (sistem murni web-responsive dashboard).
+8. Pelacakan lokasi GPS korban secara real-time (anti-surveillance).
+9. Telemedicine jarak jauh.
 
 ---
 
 # 6. Role Pengguna
 
 ## 6.1 Komandan Posko (Admin Utama)
-Penanggung jawab tertinggi operasional taktis militer/sipil di area bencana.
-* **Tugas Utama:**
-  * Mengelola pembuatan dan penonaktifan akun petugas lapangan.
-  * Memantau dasbor agregat stok logistik dan grafik penyebaran penyakit di posko.
-  * Mengatur kuota maksimal distribusi bantuan per Kepala Keluarga.
-  * Menyetujui atau membatalkan hak akses perangkat server lokal portabel.
-  * Mengeksekusi perintah *Crypto-Shredding* ketika misi tanggap darurat dinyatakan berakhir.
+
+Komandan bertanggung jawab terhadap seluruh operasional taktis, pemantauan logistik, dan keamanan data di posko darurat.
+
+### Tugas Utama Komandan
+
+* Login ke sistem dan memverifikasi kesesuaian MAC Address perangkat server.
+* Mengelola akun dan otorisasi hak akses petugas lapangan.
+* Memantau dashboard agregat (Recharts grafik penyakit dan sisa stok bantuan).
+* Mengatur ambang batas kuota harian logistik dan pasokan obat.
+* Mengizinkan sinkronisasi data lokal ke cloud pusat.
+* Mengeksekusi perintah *Crypto-Shredding* ketika misi tanggap darurat resmi ditutup.
 
 ## 6.2 Petugas Registrasi
-Petugas front-office di gerbang utama posko darurat.
-* **Tugas Utama:**
-  * Memvalidasi identitas fisik korban (KTP/IKD/Paspor/Tamu).
-  * Menginput data ke form pendaftaran digital untuk diubah menjadi *ciphertext* oleh sistem.
-  * Mencatat penjamin lokal jika korban merupakan warga luar domisili.
-  * Melakukan *generate* dan mencetak QR Code pada gelang fisik korban.
+
+Petugas front-office yang bertugas mendata korban selamat saat pertama kali datang ke posko.
+
+### Tugas Utama Petugas Registrasi
+
+* Melakukan verifikasi fisik wajah korban dan mencocokkannya dengan dokumen yang dibawa.
+* Menginput data korban reguler (NIK di-hash instan, data dienkripsi AES-256).
+* Menginput data korban tanpa dokumen menggunakan skema penjaminan saksi warga lokal (*Witness Vouching*).
+* Mengambil tangkapan gambar wajah darurat (sistem canvas client-side otomatis mengubah menjadi mosaik siluet kabur).
+* Melakukan cetak gelang fisik berisi token QR Code UUID v4.
+* Melakukan pemulihan token gelang jika dilaporkan hilang menggunakan verifikasi *Mnemonic Phrase*.
 
 ## 6.3 Petugas Logistik
-Petugas gudang atau pos pembagian barang bantuan makanan, pakaian, dan tenda.
-* **Tugas Utama:**
-  * Mengelola kuantitas stok barang masuk dari donatur.
-  * Memindai QR Code gelang korban menggunakan webcam laptop atau barcode scanner.
-  * Memeriksa status kelayakan klaim bantuan korban pada sistem.
-  * Melakukan input data pengambilan bantuan (sistem otomatis memotong stok gudang).
+
+Petugas gudang atau tenda pembagian bahan makanan, pakaian, dan perlengkapan tidur.
+
+### Tugas Utama Petugas Logistik
+
+* Mengelola master data stok barang logistik masuk dari para donatur.
+* Memindai gelang QR korban menggunakan webcam laptop atau barcode scanner.
+* Memeriksa status kelayakan klaim bantuan korban pada sistem (mencegah klaim ganda).
+* Memeriksa visual siluet mosaik wajah korban yang tampil di dashboard saat gelang di-scan.
+* Melakukan konfirmasi penyerahan bantuan (stok gudang otomatis berkurang).
 
 ## 6.4 Petugas Medis (Dokter / Perawat)
-Tenaga kesehatan di posko kesehatan lapangan darurat.
-* **Tugas Utama:**
-  * Menerima pasien korban bencana berdasarkan pemindaian QR gelang.
-  * Melihat riwayat klinis anonim, alergi obat, dan penyakit kronis korban terdahulu.
-  * Mengisi data *triage* (tingkat kegawatan medis: Merah, Kuning, Hijau, Hitam).
-  * Menginput diagnosis penyakit utama dan mencatat obat yang diberikan lapangan.
+
+Tenaga kesehatan darurat yang berjaga di tenda kesehatan posko bencana.
+
+### Tugas Utama Petugas Medis
+
+* Memindai gelang QR pasien untuk membuka dashboard pemeriksaan medis.
+* Melihat riwayat medis masa lalu pasien secara anonim (alergi obat dan penyakit kronis).
+* Mengisi keluhan kesehatan saat ini dan menentukan status warna *Triage* (Merah/Kuning/Hijau/Hitam).
+* Memilih kode penyakit dari klasifikasi penyakit darurat.
+* Memasukkan resep obat yang diberikan kepada pasien (mengurangi stok apotek darurat).
 
 ---
 
 # 7. Matriks Hak Akses
 
-| Fitur Utama Sistem | Komandan Posko | Petugas Registrasi | Petugas Logistik | Petugas Medis |
-| :--- | :---: | :---: | :---: | :---: |
-| Pembuatan Akun Petugas | **Ya** | Tidak | Tidak | Tidak |
-| Lihat Grafik Statistik Agregat | **Ya** | Tidak | Tidak | Tidak |
-| Pendaftaran Korban Baru | Tidak | **Ya** | Tidak | Tidak |
-| Cetak QR Wristband | Tidak | **Ya** | Tidak | Tidak |
-| Verifikasi Korban Non-Domisili | Tidak | **Ya** | Tidak | Tidak |
+| Fitur Utama | Komandan Posko | Petugas Registrasi | Petugas Logistik | Petugas Medis |
+| --- | --- | --- | --- | --- |
+| Registrasi akun petugas baru | **Ya** | Tidak | Tidak | Tidak |
+| Login & Whitelisting Perangkat | **Ya** | **Ya** | **Ya** | **Ya** |
+| Melihat Grafik Analitik Agregat | **Ya** | Tidak | Tidak | Tidak |
+| Kelola Akun Petugas | **Ya** | Tidak | Tidak | Tidak |
+| Pendaftaran Korban Baru (KTP) | Tidak | **Ya** | Tidak | Tidak |
+| Pendaftaran Darurat (Tanpa KTP) | Tidak | **Ya** | Tidak | Tidak |
+| Cetak Gelang QR Wristband | Tidak | **Ya** | Tidak | Tidak |
+| Blokir / Re-issue Gelang Hilang | Tidak | **Ya** | Tidak | Tidak |
 | Kelola Master Stok Logistik | **Ya** | Tidak | **Ya** | Tidak |
 | Pemindaian QR Klaim Logistik | Tidak | Tidak | **Ya** | Tidak |
-| Lihat Riwayat Klaim Logistik | **Ya** | Tidak | **Ya** | Tidak |
-| Input Data Triage & Medis | Tidak | Tidak | Tidak | **Ya** |
-| Lihat Rekam Medis Anonim | Tidak | Tidak | Tidak | **Ya** |
-| Trigger Sinkronisasi Cloud | **Ya** | Tidak | Tidak | Tidak |
+| Deteksi Klaim Ganda | Tidak | Tidak | **Ya** | Tidak |
+| Input Hasil Pemeriksaan Medis | Tidak | Tidak | Tidak | **Ya** |
+| Menentukan Kategori Triage | Tidak | Tidak | Tidak | **Ya** |
+| Input Resep & Kurangi Stok Obat | Tidak | Tidak | Tidak | **Ya** |
+| Mengakses Riwayat Medis Pasien | Tidak | Tidak | Tidak | **Ya** |
 | Trigger Fitur Crypto-Shredding | **Ya** | Tidak | Tidak | Tidak |
 
 ---
 
 # 8. Gambaran Umum Alur Sistem
 
-
-```
-
-[Korban Datang] ──> (Pos Registrasi: Input KTP/Tamu) ──> [Sistem: Hashing SHA-256 + Enkripsi AES]
-│
-▼
-[Petugas Medis: Isi Rekam Medis] <── (Cetak QR Wristband) ──> [Petugas Logistik: Scan QR Klaim Bansos]
-│                                                                 │
-▼                                                                 ▼
-(Simpan Histori Medis Anonim)                                     (Otomatis Potong Stok Gudang)
-│
-▼
-[Misi Selesai] ──> (Komandan Jalankan Crypto-Shredding) ──> [Database Lokal Terkunci Selamanya]
-
-```
+1. Korban mendatangi pos pendaftaran utama di area bencana.
+2. Petugas Registrasi membuka Form Pendaftaran SADANA lokal di browser Next.js.
+3. Jika korban membawa dokumen, petugas menginput NIK. Sistem melakukan hash SHA-256 Salted dinamis di memori RAM server.
+4. Jika korban tidak membawa dokumen, petugas memindai QR gelang saksi lokal, menginput nama alias random, dan mengklik capture wajah (canvas client-side otomatis mengubah menjadi mosaik siluet).
+5. Sistem menyimpan data ke SQLite terenkripsi AES-256 melalui Prisma ORM.
+6. Sistem menerbitkan token gelang berisi UUID v4 dan mencetak gelang QR korban beserta struk 3 kata kunci *Mnemonic Phrase*.
+7. Korban membawa gelang QR ke tenda logistik untuk klaim sembako, kamera membaca token UUID, sistem memvalidasi klaim ganda, dan memotong stok gudang harian secara otomatis jika valid.
+8. Jika korban membutuhkan penanganan klinis, gelang QR di-scan di pos kesehatan, sistem me-render rekam medis anonim, dokter menetapkan status warna Triage, serta menginput resep obat yang langsung memotong stok apotek posko.
+9. Komandan Posko memantau grafik analitik Recharts dan mengeksekusi fitur *Crypto-Shredding* ketika masa penanganan bencana resmi berakhir.
 
 ---
 
 # 9. Fitur Utama Sistem
 
-## 9.1 Otentikasi & Proteksi Sesi Internal
-* **Deskripsi:** Fitur gerbang masuk petugas posko yang menggunakan pengamanan token sesi lokal di dalam memori RAM server lapangan.
-* **Subfitur:**
-  * Login Multi-Role dengan proteksi enkripsi password bcrypt.
-  * Otomatisasi pemutusan sesi (*Session Timeout*) jika perangkat tidak mendeteksi aktivitas petugas selama 15 menit.
-  * Validasi kecocokan MAC Address laptop petugas dengan daftar putih (*Whitelisting*) yang diizinkan oleh Komandan Posko.
+## 9.1 Registrasi dan Login Petugas
 
-## 9.2 Dasbor Informasi Taktis Berbasis Role
-Setiap petugas diarahkan ke halaman dasbor khusus yang menyajikan informasi fungsional tanpa membuang waktu operasional.
+Fitur gerbang pengamanan masuk aplikasi SADANA yang mencocokkan kredensial petugas dan memvalidasi alamat fisik MAC Address laptop operasional yang digunakan di lapangan.
+
+* Registrasi akun petugas lapangan dengan penetapan role kerja.
+* Proteksi password menggunakan library hash `bcryptjs` di hulu Server Actions.
+* Middleware Route Guard untuk menyaring akses URL browser berdasarkan tipe role JWT token.
+* Deteksi dan whitelisting MAC Address fisik laptop yang diizinkan memproses data posko.
+* Force-logout otomatis (*Session Timeout*) jika sistem tidak mendeteksi aktivitas petugas selama 15 menit.
+
+## 9.2 Dashboard Berdasarkan Role
+
+Tampilan visual dashboard dirancang terpisah menggunakan dynamic layout Next.js untuk menyajikan informasi taktis yang spesifik.
 
 ### 9.2.1 Dasbor Komandan Posko (Pusat Kendali)
-* **Summary Cards:** Total korban terdata, total logistik aman (hari), grafik tren penyakit tertinggi, jumlah petugas aktif di lapangan.
-* **Tabel Cepat:** Log sinkronisasi data ke cloud, alert stok barang logistik kritis di bawah batas minimum.
-* **Fitur Taktis:** Tombol merah darurat *Crypto-Shredding* dengan konfirmasi kata sandi ganda.
+
+* Summary Cards: Total korban terdata (Regular vs Darurat Tanpa Dokumen), total komoditas bantuan aman (durasi hari ketahanan pangan), grafik tren infeksi penyakit tertinggi harian (menggunakan Recharts), dan jumlah petugas aktif.
+* Tabel Cepat: Notifikasi barang logistik di bawah ambang batas minimum, log aktivitas penyerahan bansos harian, dan log penanganan medis darurat.
+* Fitur Taktis: Tombol darurat merah *Crypto-Shredding* dengan otorisasi password ganda, tombol sinkronisasi biner data terenkripsi lokal ke cloud pusat.
 
 ### 9.2.2 Dasbor Petugas Registrasi
-* **Summary Cards:** Jumlah korban yang berhasil didaftarkan hari ini, jumlah token QR aktif, statistik korban lokal vs luar daerah.
-* **Form Utama:** Input data cepat terintegrasi pembaca kartu IKD/KTP digital.
+
+* Summary Cards: Korban terdaftar hari ini, gelang QR aktif tercetak, sisa kuota voucher darurat offline.
+* Form Utama: Form Registrasi Regular (Input NIK -> auto-hashing SHA-256) dan Form Registrasi Darurat (Tanpa KTP -> Verifikasi saksi penjamin + Capture wajah mosaik).
+* Panel Pemulihan (Recovery): Input verifikasi 3 kata kunci *Mnemonic Phrase* untuk cetak ulang gelang hilang.
 
 ### 9.2.3 Dasbor Petugas Logistik
-* **Summary Cards:** Total bantuan keluar hari ini, sisa stok beras/air bersih/pakaian, daftar donatur terbaru.
-* **Komponen Utama:** Jendela pemindaian kamera aktif (*Live Scanner Web*) untuk membaca gelang korban secara instan.
+
+* Summary Cards: Total paket bansos keluar hari ini, sisa stok sembako di posko, antrean logistik yang belum terlayani.
+* Komponen Utama: Jendela pemindai kamera aktif (`<QrReader/>` React component) terintegrasi library `html5-qrcode`, panel pop-up status verifikasi (Warna Hijau = Klaim Valid, Warna Merah = Double Claim / Gelang Ditangguhkan), panel foto siluet mosaik wajah korban pembawa gelang.
 
 ### 9.2.4 Dasbor Petugas Medis
-* **Summary Cards:** Pasien dalam antrean darurat, total pasien tertangani hari ini, grafik statistik status warna *triage*.
-* **Tabel Utama:** Daftar nomor antrean medis anonim beserta rincian keluhan awal krisis.
 
----
+* Summary Cards: Pasien menanti antrean kesehatan, pasien selesai tertangani dokter hari ini, ketersediaan obat kritis di apotek darurat.
+* Tabel Antrean: Nomor antrean pasien medis berdasarkan token gelang QR anonim.
+* Form Rekam Medis: Input diagnosa rekam medis, status warna triage, dan input resep obat darurat.
 
-## 9.3 Manajemen Kriptografi & Masking Identitas (Fitur Inti Track III)
-* **Deskripsi:** Modul pengolah data di balik layar (*back-end processing*) yang mengamankan privasi korban semenjak data diinput pertama kali.
-* **Spesifikasi Teknis:**
-  * **Algoritma Hashing:** Mengubah NIK korb menjadi `hash('sha256', $nik)` untuk memvalidasi duplikasi data tanpa menyimpan teks NIK asli ke database.
-  * **Data Masking:** Data nama korban diubah menjadi inisial acak pada tampilan visual petugas logistik dan medis (contoh: "Ahmad Jailani" hanya terbaca sebagai "Korban AJ - ID 982").
-  * **Dynamic Encryption:** Informasi alamat dan nomor telepon dienkripsi menggunakan metode `AES-256-CBC` dengan kunci dinamis yang disimpan di memori RAM server, bukan pada file konfigurasi `.env` statis.
+## 9.3 Manajemen Akun Petugas
 
----
+Digunakan Komandan Posko untuk mengontrol pembuatan kredensial baru petugas lapangan dan mendaftarkan whitelist hardware laptop operasional.
 
-## 9.4 Modul Penjaminan Korban Luar Domisili (Vouching System)
-* **Deskripsi:** Mengakomodasi kebutuhan hukum bantuan kemanusiaan bagi turis atau warga luar daerah yang kehilangan dokumen identitas saat krisis terjadi.
-* **Aturan Kerja:**
-  * Petugas registrasi memilih opsi "Warga Luar Daerah/Tanpa KTP".
-  * Sistem meminta input data akun "Penjamin Lokal" (bisa berupa nomor KK warga lokal pemilik tempat menginap, ID petugas pengelola hotel, atau ID Ketua RT setempat).
-  * Sistem membatasi kuota penjaminan (*Vouching Quota Limitation*) maksimal 3 orang per kepala keluarga lokal untuk memitigasi kecurangan pencairan bansos oleh spekulan.
+* Tambah akun petugas baru (dengan penetapan role).
+* Edit data profil operasional petugas.
+* Menonaktifkan akun petugas secara instan.
+* Memasukkan alamat fisik MAC Address laptop petugas.
 
----
+## 9.4 Registrasi Korban & Hashing NIK
 
-## 9.5 Modul Manajemen Logistik & Validasi Klaim Ganda
-* **Deskripsi:** Mengontrol keluar masuknya komoditas logistik posko dan mendeteksi upaya penipuan klaim ganda bantuan.
-* **Subfitur:**
-  * Inventory Management (Tambah stok, input nama donatur, konversi satuan kemasan).
-  * Pembatasan Frekuensi Klaim: Saat QR Code gelang discan, sistem mengecek tabel `logistic_claims`. Jika korban sudah mengambil jatah makan siang pada hari tersebut, sistem memunculkan warna merah (*Alert: Double Claim Detected*).
+Fitur pendataan di gerbang utama posko yang mengonversi nomor NIK secara otomatis menggunakan kriptografi satu arah SHA-256.
 
----
+* Validasi format panjang digit NIK (harus tepat 16 digit).
+* Enkripsi hash satu arah SHA-256 dengan *Master Salt Key* di RAM server sebelum dikirimkan ke database SQLite.
+* Enkripsi simetris AES-256-CBC untuk kolom alamat dan nomor telepon korban.
 
-## 9.6 Modul Rekam Medis Darurat & Triage Posko
-* **Deskripsi:** Membantu penanganan medis taktis tanpa mengabaikan kerahasiaan riwayat kesehatan masa lalu pasien krisis.
-* **Subfitur:**
-  * Penentuan Kategori Triage (Merah = Kritis, Kuning = Cedera Berat, Hijau = Ringan, Hitam = Meninggal Dunia).
-  * Pencatatan riwayat alergi obat darurat yang terenkripsi dalam tabel terpisah yang hanya dapat didekripsi oleh kunci privat milik dokter pemeriksa yang sah.
+## 9.5 Vouching Saksi Komunitas (Web of Trust)
+
+Mengakomodasi penanganan pendaftaran bagi korban yang kehilangan seluruh dokumen identitas melalui jaminan saksi tetangga yang sah.
+
+* Pemindaian QR gelang milik warga lokal terdaftar sebagai saksi penjamin.
+* Perekaman relasi `witnessVictimId` pada database.
+* Pembatasan kuota penjaminan maksimal 3 orang korban darurat per satu saksi warga lokal.
+
+## 9.6 Pemindaian QR & Bansos
+
+Pemrosesan asinkronus scan gelang QR untuk pencairan barang logistik darurat.
+
+* Decoding string token UUID v4 dari gambar pemindaian kamera.
+* Pencocokan asinkronus token ke database SQLite.
+* Validasi status token (harus berstatus `Lokal` atau `Emergency_Unverified`).
+
+## 9.7 Triage Medis & Rekam Medis Anonim
+
+Klasifikasi kegawatan pasien bencana dan penyimpanan rekam jejak klinis darurat secara anonim.
+
+* Pilihan Kategori Triage Berwarna (Merah = Kritis, Kuning = Sedang, Hijau = Ringan, Hitam = Meninggal Dunia).
+* Enkripsi AES-256 pada kolom catatan klinis pasien.
+* Pengikatan catatan medis ke token UUID gelang anonim korban, bukan identitas nama aslinya.
+
+## 9.8 Manajemen Penyakit (ICD-10 Sederhana)
+
+Master data klasifikasi jenis penyakit darurat bencana untuk mempermudah input dokter.
+
+* Tambah master jenis penyakit posko.
+* Validasi kode penyakit ICD-10 unik.
+* Dropdown pencarian penyakit aktif pada form rekam medis dokter.
+
+## 9.9 Manajemen Obat
+
+Master data inventaris pasokan obat-obatan di apotek posko darurat.
+
+* Input stok obat masuk.
+* Validasi tanggal kedaluwarsa (*expiry date*) obat darurat.
+* Alert stok obat rendah di dashboard medis.
+
+## 9.10 Resep & Pengurangan Stok Otomatis
+
+Integrasi pemberian obat darurat oleh dokter dengan pengurangan stok riil apotek posko.
+
+* Input kuantitas buotir/botol obat pada rekam medis.
+* Validasi ketersediaan stok apotek.
+* Pengurangan stok obat secara aman memanfaatkan database transaction Prisma (`$transaction`).
+
+## 9.11 Emergency Mnemonic Phrase
+
+Sistem pemulihan gelang hilang tanpa menggunakan data nama atau dokumen korban.
+
+* Generator acak 3 kata kunci dari kamus bahasa sederhana saat pertama kali korban mendaftar.
+* Pencetakan kata kunci pemulihan pada struk kertas kecil terpisah.
+* Kueri pencarian record korban berdasarkan input 3 kata kunci pemulihan.
+
+## 9.12 Crypto-Shredding
+
+Mekanisme pertahanan aktif yang memusnahkan kemampuan dekripsi database SQLite lokal.
+
+* Penghapus file kunci master dari RAM server lokal.
+* Overwrite acak sebanyak 3 siklus berturut-turut pada sektor penyimpanan fisik kunci master.
+* Force-logout semua sesi petugas lapangan.
+
+## 9.13 Local Hot-Standby Replication
+
+Sistem cadangan asinkronus lokal untuk menjamin operasional posko bebas dari kendala *single point of failure*.
+
+* Penyerapan asinkronus data SQLite terenkripsi harian di latar belakang browser laptop petugas logistik.
+* Deklarasi otomatis laptop petugas lapangan menjadi Master Server baru jika server pusat padam.
+
+## 9.14 SOP Kertas Kriptografis
+
+Voucher fisik penjamin distribusi bansos manual saat seluruh komputer posko lumpuh total.
+
+* Generator kode numerik unik voucher menggunakan algoritma HOTP (HMAC-Based One-Time Password).
+* Sinkronisasi data kueri numerik voucher saat komputer menyala kembali.
+
+## 9.15 Riwayat
+
+* Riwayat pendaftaran petugas lapangan dan log perangkat internal.
+* Riwayat pengambilan bansos harian korban (mencegah klaim ganda).
+* Riwayat rekam medis darurat (membantu penanganan klinis berikutnya).
+* Riwayat penjaminan saksi warga lokal.
+
+## 9.16 Laporan Sederhana
+
+Penyusunan data agregat operasional posko bencana dalam bentuk tabel visual di dashboard Komandan.
+
+* Grafik trend penyakit menular (ICD-10) harian posko.
+* Laporan total bansos terdistribusi berdasarkan kategori waktu.
+* Laporan stok barang kritis logistik dan obat apotek.
 
 ---
 
 # 10. Use Case Utama
 
 1. **UC-01:** Registrasi Petugas Lapangan Baru oleh Komandan.
-2. **UC-02:** Login Petugas dan Whitelisting Perangkat Server Lokal.
-3. **UC-03:** Pendaftaran Korban dengan Sistem Auto-Hashing NIK.
-4. **UC-04:** Pembuatan dan Pencetakan Gelang QR Token Kemanusiaan.
-5. **UC-05:** Validasi Penjaminan (*Vouching*) Korban Luar Domisili.
-6. **UC-06:** Pemindaian QR dan Pengambilan Jatah Logistik Bantuan.
-7. **UC-07:** Input Hasil Pemeriksaan Klinis dan Penentuan Status Triage.
-8. **UC-08:** Pemantauan Grafik Agregat Inventaris oleh Komandan Posko.
-9. **UC-09:** Sinkronisasi Manual Data Posko Lokal ke Server Cloud Pusat.
-10. **UC-10:** Penghancuran Kunci Enkripsi Komando (*Crypto-Shredding Trigger*).
+2. **UC-02:** Login Petugas Lapangan & Whitelisting MAC Address.
+3. **UC-03:** Registrasi Korban Regular (Auto-Hash NIK).
+4. **UC-04:** Registrasi Darurat Tanpa KTP (Saksi Komunitas / Witness Vouching).
+5. **UC-05:** Pembuatan & Pencetakan Gelang QR Token Kemanusiaan.
+6. **UC-06:** Pemindaian Gelang QR & Klaim Logistik Bantuan harian.
+7. **UC-07:** Input Triage Medis & Rekam Medis Anonim pasien.
+8. **UC-08:** Pemantauan Grafik Agregat Logistik & Medis oleh Komandan.
+9. **UC-09:** Sinkronisasi Manual Database Lokal ke Cloud Pusat.
+10. **UC-10:** Eksekusi Fitur Crypto-Shredding Pasca-Bencana oleh Komandan.
 
 ---
 
@@ -260,8 +377,8 @@ flowchart LR
         UC1([UC-01: Kelola Akun Petugas])
         UC2([UC-02: Login & Whitelisting])
         UC3([UC-03: Registrasi Korban & Hash NIK])
-        UC4([UC-04: Cetak Gelang QR])
-        UC5([UC-05: Verifikasi Vouching Tamu])
+        UC4([UC-04: Registrasi Darurat Tanpa KTP])
+        UC5([UC-05: Cetak Gelang QR])
         UC6([UC-06: Scan QR & Klaim Logistik])
         UC7([UC-07: Input Triage & Medis Anonim])
         UC8([UC-08: Pantau Grafik Agregat Posko])
@@ -292,23 +409,37 @@ flowchart LR
 
 # 12. Alur Kerja Sistem
 
-## 12.1 Alur Registrasi Korban dan Penerbitan Gelang Identitas
+## 12.1 Alur Registrasi Korban (Regular & Darurat)
 
-1. Korban mendatangi meja pendaftaran posko.
-2. Petugas Registrasi membuka Form Pendaftaran pada web aplikasi SADANA lokal.
-3. Petugas menginput data nama, tanggal lahir, dan nomor KTP/Paspor.
-4. Di sisi *back-end*, sistem memproses nomor KTP menggunakan fungsi kriptografi SHA-256 menjadi string acak sepanjang 64 karakter.
-5. Sistem memeriksa ke dalam database apakah string hash tersebut sudah terdaftar sebelumnya.
-6. Jika aman, nama korban dienkripsi dengan metode AES-256, kemudian sistem menerbitkan kode token acak (UUID v4) yang dicetak menjadi QR Code pada gelang fisik korban.
+1. Korban mendatangi pos pendaftaran utama.
+2. Petugas Registrasi membuka Form Pendaftaran SADANA lokal di browser.
+3. Jika korban membawa dokumen, petugas menginput NIK. Next.js melakukan hash SHA-256 Salted dinamis di memori RAM server.
+4. Jika korban tidak membawa dokumen, petugas memindai QR gelang saksi lokal, menginput nama alias random, dan mengklik capture wajah (canvas client-side otomatis mengubah menjadi mosaik siluet).
+5. Sistem menyimpan data ke SQLite terenkripsi AES-256.
+6. Sistem menerbitkan token gelang berisi UUID v4 dan mencetak gelang QR korban beserta struk 3 kata kunci *Mnemonic Phrase*.
 
-## 12.2 Alur Distribusi Logistik dan Pencegahan Klaim Ganda
+## 12.2 Alur Distribusi Logistik & Validasi Klaim Ganda
 
-1. Korban membawa gelang QR ke tenda logistik untuk mengambil jatah makan harian.
-2. Petugas Logistik mengarahkan gelang QR ke kamera barcode scanner laptop.
-3. Sistem memvalidasi token QR ke tabel `victims`.
-4. Jika token valid, sistem membaca status kelayakan pada hari itu melalui query ke tabel `logistic_claims`.
-5. Apabila korban terdeteksi sudah mengambil haknya dalam parameter waktu yang ditentukan (misal: Kategori Makan Siang pukul 11:00 - 14:00), sistem menolak dan membunyikan alarm visual di dasbor petugas logistik.
-6. Jika belum, petugas menyerahkan barang bantuan, menekan tombol "Konfirmasi Penyerahan", dan stok komoditas di tabel `medicines/goods` otomatis berkurang secara real-time.
+1. Korban membawa gelang QR ke tenda logistik.
+2. Petugas Logistik mengaktifkan kamera scanner di halaman dashboard logistik.
+3. Kamera membaca token UUID dari gelang QR.
+4. API Next.js memeriksa status kelayakan token pada hari itu ke tabel `LogisticClaim`.
+5. Jika terdeteksi klaim ganda, API mengembalikan response status 400. Dashboard logistik memicu border merah, membunyikan alarm suara, dan menampilkan peringatan "Double Claim Detected!".
+6. Jika valid, sistem memproses penyerahan barang bantuan, memotong stok gudang secara transaksional, dan mencatat klaim logistik.
+
+## 12.3 Alur Dashboard
+
+1. Petugas melakukan proses login ke aplikasi.
+2. Sistem mengekstrak data role dari muatan JWT token.
+3. Router Next.js mengalihkan halaman petugas ke layout dashboard yang bersesuaian.
+4. Komponen memanggil fungsi `fetch` asinkronus lokal untuk memuat widget ringkasan data taktis secara real-time.
+
+## 12.4 Alur Laporan
+
+1. Komandan membuka menu Laporan Analitik pada dashboard pusat.
+2. Komandan mengatur filter jenis komoditas barang logistik atau klasifikasi penyakit.
+3. Sistem memproses penarikan kueri agregat dari database SQLite lokal.
+4. Hasil pengolahan data ditampilkan dalam bentuk grafik interaktif Recharts dan ringkasan angka tabel berkontras tinggi.
 
 ---
 
@@ -318,24 +449,23 @@ flowchart LR
 flowchart TD
     Start([Mulai Pendataan Korban]) --> Login[Petugas Registrasi Login]
     Login --> OpenForm[Buka Form Registrasi Lapangan]
-    OpenForm --> CheckDom[Apakah Korban Memiliki KTP Lokal?]
+    OpenForm --> CheckDom{Pilihan Metode Registrasi}
     
-    CheckDom -- Ya --> InputNIK[Input NIK KTP Fisik / IKD]
-    InputNIK --> HashProcess[Sistem Jalankan Auto-Hash SHA-256]
+    CheckDom -- Opsi A: Ada KTP --> InputNIK[Input NIK KTP Fisik]
+    InputNIK --> HashProcess[Next.js API Jalankan Auto-Hash SHA-256]
     HashProcess --> CheckDup{Apakah Hash NIK Sudah Ada?}
-    CheckDup -- Ya --> RejectForm[Tampilkan Peringatan: Korban Sudah Terdaftar]
-    CheckDup -- Tidak --> EncryptData[Enkripsi Data Pribadi via AES-256]
+    CheckDup -- Ya --> RejectForm[React Tampilkan Peringatan: Korban Sudah Terdaftar]
+    CheckDup -- Tidak --> EncryptData[Enkripsi Data Pribadi via Node Crypto AES-256]
     
-    CheckDom -- Tidak --> InputVouch[Input ID Warga Lokal Sebagai Penjamin]
-    InputVouch --> CheckQuota{Kuota Penjamin Aman?}
-    CheckQuota -- Tidak --> RejectVouch[Tolak Pendaftaran: Kuota RT/KK Penuh]
-    CheckQuota -- Ya --> EncryptData
+    CheckDom -- Opsi B: Tanpa KTP --> ScanWitness[Scan Gelang QR Warga Lokal Sebagai Saksi]
+    ScanWitness --> CaptureFace[Ambil Foto Wajah via Webcam Perangkat]
+    CaptureFace --> BindEmergency[Tautkan WitnessVictimId & Set Flag IsEmergency = True]
+    BindEmergency --> EncryptData
     
     EncryptData --> GenUUID[Generate Token UUID Keamanan]
-    GenUUID --> PrintQR[Cetak Token Menjadi QR Code Gelang]
+    GenUUID --> PrintQR[React Tampilkan & Cetak Token QR Code]
     PrintQR --> End([Selesai - Gelang Diserahkan])
     RejectForm --> End
-    RejectVouch --> End
 
 ```
 
@@ -345,19 +475,19 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    A([Mulai Pelayanan Medis]) --> B[Scan QR Code Gelang Korban]
-    B --> C[Sistem Membaca Token UUID]
+    A([Mulai Pelayanan Medis]) --> B[Scan QR Code Gelang via React Component]
+    B --> C[Next.js API Membaca Token UUID]
     C --> D{Apakah Token Valid?}
-    D -- Tidak --> E[Tampilkan Pesan: Gelang Tidak Terdaftar / Expired]
-    D -- Ya --> F[Sistem Tampilkan Profil Anonim & Riwayat Alergi]
+    D -- Tidak --> E[React Tampilkan Pesan: Gelang Tidak Terdaftar / Expired]
+    D -- Ya --> F[React Tampilkan Profil Anonim & Riwayat Alergi]
     F --> G[Dokter Mengisi Form Pemeriksaan Darurat]
     G --> H[Pilih Status Tingkat Triage Medis]
     H --> I{Apakah Pasien Membutuhkan Obat?}
     I -- Ya --> J[Pilih Obat dari Tabel Inventaris Medis]
-    J --> K[Sistem Validasi Stok Obat Lokal]
+    J --> K[Next.js Server Validasi Stok Obat Lokal]
     K --> L{Stok Cukup?}
     L -- Ya --> M[Kurangi Stok Obat Otomatis]
-    L -- Tidak --> N[Tampilkan Alert: Stok Obat Habis]
+    L -- Tidak --> N[React Tampilkan Alert: Stok Obat Habis]
     N --> J
     M --> O[Simpan Hasil Rekam Medis Darurat]
     I -- Tidak --> O
@@ -371,92 +501,100 @@ flowchart TD
 
 # 15. Kebutuhan Fungsional
 
-## 15.1 Modul Kriptografi Lapangan (Security Engine)
+## 15.1 Modul Registrasi & Autentikasi Petugas
 
-* Sistem harus langsung melakukan hashing satu arah pada data NIK/Paspor di memori RAM sebelum query SQL dikirimkan ke database lokal.
-* Sistem harus mengenkripsi kolom alamat dan nomor telepon menggunakan kunci enkripsi simetris dinamis.
-* Sistem harus menyediakan mekanisme pengecekan berkala terhadap integritas tabel database untuk mendeteksi manipulasi data luar.
+* Sistem harus menerima input username, password, dan MAC Address untuk otorisasi login.
+* Password wajib di-hash menggunakan algoritma `bcryptjs` sebelum disimpan di basis data SQLite lokal.
+* Route Guard Next.js middleware harus membatasi akses petugas berdasarkan JWT token yang valid.
 
-## 15.2 Modul Penanganan Jaringan Offline-First
+## 15.2 Modul Kriptografi Lapangan (Security Engine)
 
-* Sistem harus dapat berjalan normal menggunakan protokol komunikasi lokal HTTP tanpa koneksi internet WAN.
-* Sistem harus menyediakan fitur penyimpanan *Queue* lokal di dalam IndexedDB browser petugas apabila laptop operator kehilangan koneksi ke server router lokal portabel untuk sementara waktu.
-* Sistem harus mendukung ekspor data terenkripsi ke dalam format file biner terkompresi (.bin) untuk dipindahkan secara manual menggunakan flashdisk ke posko pusat apabila sinkronisasi online mengalami kegagalan total.
+* Sistem harus melakukan Hashing SHA-256 Salted dinamis di memori RAM server pada NIK korban saat proses registrasi.
+* Sistem harus mengenkripsi kolom data profil dan gambar siluet wajah menggunakan algoritma AES-256-CBC.
+* Sistem harus mengintegrasikan pengolahan canvas pixelate mosaik di sisi front-end React sebelum gambar wajah dikirimkan ke backend.
+
+## 15.3 Modul Manajemen Logistik & Apotek Posko
+
+* Sistem harus mencatat kuantitas stok barang logistik dan pasokan obat-obatan posko.
+* Pengurangan stok logistik harian dan obat-obatan medis harus menggunakan transaksi database aman (`$transaction`) untuk mencegah *data race conditions*.
+* Sistem harus mendeteksi secara otomatis jika sisa stok di database berada di bawah batas minimum (*minimum threshold*).
 
 ---
 
 # 16. Kebutuhan Non-Fungsional
 
-1. **Sistem Operasi Perangkat:** Aplikasi berbasis web harus kompatibel dengan browser modern (Google Chrome / Mozilla Firefox) yang berjalan di OS Windows, Linux, maupun macOS pada laptop lapangan petugas.
-2. **Kecepatan Respons Pemanduan:** Proses pembacaan QR Code lewat webcam hingga validasi database tidak boleh melebihi waktu 1,5 detik per orang untuk mencegah kerumunan massa di tenda posko.
-3. **Desain Antarmuka (UI):** Menggunakan framework Tailwind CSS dengan tema kontras tinggi yang ramah untuk penggunaan di bawah sinar matahari langsung maupun kondisi pencahayaan tenda darurat yang redup.
-4. **Keamanan Database Lokal:** Hak akses root database pada server laptop portabel wajib dilindungi kata sandi acak berkekuatan tinggi yang di-generate otomatis saat instalasi sistem pertama kali.
+1. **Kompatibilitas Browser:** Aplikasi web SADANA harus berjalan mulus di browser modern (Google Chrome, Firefox) pada laptop petugas lapangan.
+2. **Kesiapan Jaringan Offline:** Sistem harus dapat berjalan 100% secara lokal pada protokol HTTP tanpa ketergantungan pada koneksi WAN internet.
+3. **Response Time Verifikasi:** Proses pemindaian QR gelang hingga validasi kelayakan logistik di database SQLite lokal tidak boleh melebihi durasi 1.5 detik.
+4. **Desain UI Responsif:** Menggunakan Tailwind CSS tema kontras tinggi yang ramah untuk pencahayaan darurat di area bencana.
+5. **Keamanan Local Storage:** Kunci enkripsi utama wajib diisolasi di memori RAM server Next.js dan tidak boleh ditulis dalam file konfigurasi SSD lokal.
 
 ---
 
 # 17. Aturan Bisnis (Business Rules)
 
-1. Satu nomor token QR gelang hanya boleh terikat pada satu profil identitas korban yang valid di dalam sistem.
-2. Petugas lapangan dilarang keras memiliki hak akses untuk mengekspor atau melihat daftar tabel database secara keseluruhan (*No Bulk Data Export for Officers*).
-3. Validasi status klaim bantuan logistik harian didasarkan pada zona waktu lokal server posko darurat tempat barang tersebut didistribusikan.
-4. Otoritas penjaminan (*Vouching*) warga non-domisili hanya dapat diberikan oleh pengguna sistem yang memiliki tingkat verifikasi akun minimal setingkat Kepala Urusan Desa atau Petugas Registrasi Internal Senior.
-5. Perintah penghancuran data (*Crypto-Shredding*) bersifat merusak secara permanen dan tidak dapat dibatalkan (*Irreversible Command*). Begitu tombol ditekan, data yang terenkripsi tidak akan pernah bisa dibaca lagi selamanya.
+1. Kredensial login petugas lapangan hanya sah jika diakses dari perangkat laptop dengan alamat MAC Address yang di-whitelist oleh Komandan.
+2. NIK korban regular yang dimasukkan wajib di-hash satu arah secara instan dan NIK asli dibuang dari memori RAM server.
+3. Korban berstatus darurat tanpa dokumen identitas wajib memiliki relasi penjamin saksi warga lokal (`witnessVictimId`).
+4. Satu orang warga lokal pemilik KTP sah hanya diperbolehkan menjadi penjamin saksi maksimal untuk 3 orang korban darurat.
+5. Transaksi penyerahan bansos harian dibatasi kuota 1 paket per barang untuk 1 token UUID gelang korban setiap harinya.
+6. Perintah penghancuran data (*Crypto-Shredding*) bersifat mutlak dan merusak kunci dekripsi secara permanen (tidak dapat dibatalkan).
 
 ---
 
 # 18. Validasi Data
 
-* Field Nama Korban tidak boleh mengandung karakter angka atau simbol khusus.
-* Panjang data NIK KTP wajib tepat berisi 16 digit angka numerik.
-* Sistem harus menolak pemindaian QR gelang jika status token di database telah diatur menjadi `Ditangguhkan / Hilang`.
-* Jumlah input pengambilan logistik bantuan tidak boleh bernilai negatif atau bernilai lebih besar daripada sisa stok riil yang tercatat di sistem gudang.
-* Catatan klasifikasi rekam medis darurat wajib memiliki status kode *triage* yang jelas sebelum data pemeriksaan dapat disimpan oleh dokter.
+* Username petugas lapangan tidak boleh kosong dan harus unik di database.
+* Format NIK korban regular wajib tervalidasi tepat berisi 16 digit angka numerik.
+* Sistem harus menolak scan gelang QR jika token UUID di database SQLite terdeteksi berstatus `REVOKED` atau `EXPIRED`.
+* Input pengurangan stok logistik dan obat darurat apotek posko tidak boleh bernilai negatif.
+* Form rekam medis darurat dokter wajib diisi dengan status klasifikasi warna Triage sebelum disimpan.
 
 ---
 
 # 19. Use Case Specification
 
-## 19.1 Use Case — Registrasi Korban & Auto-Hash NIK
+## 19.1 Use Case — Registrasi Korban (Auto-Hash NIK)
 
 | Elemen Spesifikasi | Deskripsi Detail |
 | --- | --- |
-| **Nama Use Case** | Registrasi Korban & Auto-Hash NIK |
+| **Nama Use Case** | Registrasi Korban (Auto-Hash NIK) |
 | **Aktor Utama** | Petugas Registrasi |
 | **Tujuan** | Mendaftarkan identitas korban bencana secara aman tanpa mengeksploitasi data pribadi asli. |
 | **Prasyarat** | Petugas telah login ke sistem lokal SADANA dan komputer terhubung ke printer gelang. |
-| **Alur Utama Kerja** | 1. Petugas membuka form input pendaftaran korban krisis.<br>
+| **Alur Utama Kerja** | 1. Petugas membuka form input pendaftaran korban krisis pada aplikasi Next.js.<br>
 
 <br>2. Petugas memasukkan nama inisial, tanggal lahir, dan nomor NIK asli.<br>
 
-<br>3. Sistem mendeteksi input NIK dan melakukan konversi enkripsi satu arah SHA-256 secara real-time di memori RAM.<br>
+<br>3. Next.js Server Actions mendeteksi input NIK dan melakukan konversi enkripsi satu arah SHA-256 menggunakan `crypto.createHash` yang dipadukan dengan Master RAM Salt.<br>
 
 <br>4. Sistem memeriksa apakah string hash tersebut sudah ada di tabel database lokal.<br>
 
-<br>5. Jika unik, data pribadi dienkripsi dengan AES-256 dan disimpan ke database.<br>
+<br>5. Jika unik, data pribadi dienkripsi dengan AES-256-CBC dan disimpan ke database SQLite.<br>
 
 <br>6. Sistem menerbitkan UUID v4 baru sebagai representasi token gelang digital korban. |
 | **Kondisi Akhir** | Profil korban tersimpan dengan aman, identitas asli tersembunyi, dan gelang QR siap dicetak. |
 
-## 19.2 Use Case — Eksekusi Fitur Crypto-Shredding Pasca-Bencana
+## 19.2 Use Case — Registrasi Darurat Tanpa Dokumen (Saksi Komunitas)
 
 | Elemen Spesifikasi | Deskripsi Detail |
 | --- | --- |
-| **Nama Use Case** | Eksekusi Fitur Crypto-Shredding Pasca-Bencana |
-| **Aktor Utama** | Komandan Posko (Admin Utama) |
-| **Tujuan** | Menghancurkan kunci enkripsi utama secara permanen untuk mengunci database lokal selamanya dari risiko kebocoran data. |
-| **Prasyarat** | Masa tanggap darurat bencana telah resmi dinyatakan selesai oleh pemerintah pusat. |
-| **Alur Utama Kerja** | 1. Komandan Posko membuka menu Pengaturan Keamanan Tingkat Tinggi di Dasbor Utama.<br>
+| **Nama Use Case** | Registrasi Darurat Tanpa Dokumen (Saksi Komunitas) |
+| **Aktor Utama** | Petugas Registrasi |
+| **Tujuan** | Mendaftarkan korban yang tidak memiliki / kehilangan dokumen identitas agar tetap mendapatkan penanganan kemanusiaan yang terstruktur dan akuntabel. |
+| **Prasyarat** | Petugas telah login ke sistem, dan terdapat warga lokal penjamin yang memiliki gelang QR aktif terverifikasi. |
+| **Alur Utama Kerja** | 1. Petugas mengaktifkan mode "Registrasi Darurat (Tanpa Dokumen)" pada form Next.js.<br>
 
-<br>2. Komandan menekan tombol merah bertuliskan "Akhiri Misi & Hancurkan Kunci Enkripsi Lokal".<br>
+<br>2. Petugas memindai gelang QR warga lokal yang bertindak sebagai saksi penjamin.<br>
 
-<br>3. Sistem memunculkan jendela pop-up peringatan keras dan meminta input kata sandi konfirmasi.<br>
+<br>3. Sistem melakukan validasi terhadap token saksi dan memeriksa sisa kuota vouching saksi tersebut.<br>
 
-<br>4. Komandan memasukkan kata sandi rahasia komando.<br>
+<br>4. Jika kuota aman, petugas menginput inisial nama korban darurat dan menyalakan webcam untuk mengambil foto wajah korban.<br>
 
-<br>5. Sistem mengeksekusi fungsi penghapusan file kunci enkripsi (*Master Key*) menggunakan metode pengisian data acak (*shredding overwrite*) sebanyak 3 siklus berturut-turut pada sektor penyimpanan fisik.<br>
+<br>5. Sistem mengenkripsi data gambar wajah dan menyimpannya bersama data tautan `witnessVictimId` dengan flag `isEmergency = true`.<br>
 
-<br>6. Sistem memutus koneksi database dan melakukan force-logout pada seluruh sesi petugas aktif. |
-| **Kondisi Akhir** | Database lokal terkunci secara absolut menjadi teks acak yang mustahil didekripsi kembali selamanya. Perangkat laptop lapangan kini aman dikembalikan ke instansi asal. |
+<br>6. Sistem mencetak gelang QR dengan token UUID baru berstatus `Emergency_Unverified`. |
+| **Kondisi Akhir** | Korban tanpa dokumen berhasil terdata dalam sistem Web of Trust dan mendapatkan hak akses bantuan darurat tanpa risiko kebocoran identitas. |
 
 ---
 
@@ -466,130 +604,131 @@ flowchart TD
 
 Sistem SADANA beroperasi menggunakan **11 tabel relasional utama** berikut:
 
-1. `users`: Menyimpan kredensial otentikasi akun internal petugas posko.
-2. `victims`: Menyimpan data profil korban yang telah di-hash dan di-masking.
-3. `vouching_records`: Mencatat data histori penjaminan korban luar domisili / tanpa dokumen.
-4. `logistic_items`: Menyimpan daftar komoditas barang bantuan logistik kemanusiaan di gudang.
-5. `logistic_claims`: Mencatat log histori pemindaian klaim komoditas logistik harian korban.
-6. `diseases`: Master data klasifikasi jenis penyakit darurat krisis di posko lapangan.
-7. `triage_records`: Mencatat pengelompokan tingkat kegawatan pasien medis bencana.
-8. `medical_logs`: Menyimpan detail hasil pemeriksaan rekam medis darurat anonim oleh dokter.
-9. `medicines`: Menyimpan master data obat-obatan medis darurat di apotek posko.
-10. `medical_prescriptions`: Menghubungkan rekam medis dengan obat-obatan yang diserahkan ke korban.
-11. `system_keys`: Menyimpan data parameter enkripsi lokal yang dikunci di dalam memori RAM server.
+1. `User`: Menyimpan kredensial otentikasi akun internal petugas posko.
+2. `Victim`: Menyimpan data profil korban yang telah di-hash dan di-masking.
+3. `witnessedVictims` (Self-relation model relasi pada tabel Victim): Mencatat data relasi penjaminan korban darurat tanpa dokumen.
+4. `LogisticItem`: Menyimpan daftar komoditas barang bantuan logistik kemanusiaan di gudang.
+5. `LogisticClaim`: Mencatat log histori pemindaian klaim komoditas logistik harian korban.
+6. `Disease`: Master data klasifikasi jenis penyakit darurat krisis di posko lapangan.
+7. `TriageRecord`: Mencatat pengelompokan tingkat kegawatan pasien medis bencana.
+8. `MedicalLog`: Menyimpan detail hasil pemeriksaan rekam medis darurat anonim oleh dokter.
+9. `Medicine`: Menyimpan master data obat-obatan medis darurat di apotek posko.
+10. `MedicalPrescription`: Menghubungkan rekam medis dengan obat-obatan yang diserahkan ke korban.
+11. `SystemKey`: Menyimpan data parameter enkripsi lokal yang dikunci di dalam memori RAM server.
 
 ---
 
-## 20.2 Tabel `users`
+## 20.2 Tabel `User`
 
 | Nama Kolom | Tipe Data | Aturan / Keterangan |
 | --- | --- | --- |
-| UserId | int PK | Auto Increment |
-| Username | varchar(50) | Unik, digunakan untuk login petugas |
-| Password | varchar(255) | Terenkripsi menggunakan algoritma bcrypt |
-| Role | varchar(30) | Komandan / Registrasi / Logistik / Medis |
-| MacAddress | varchar(17) | Validasi fisik perangkat keras laptop petugas |
-| IsActive | bit | Status keaktifan akun petugas di lapangan |
+| id | Int (PK) | Auto Increment |
+| username | String | Unik, digunakan untuk login petugas |
+| password | String | Terenkripsi menggunakan algoritma bcryptjs |
+| role | String | Komandan / Registrasi / Logistik / Medis |
+| macAddress | String | Validasi fisik perangkat keras laptop petugas |
+| isActive | Boolean | Status keaktifan akun petugas di lapangan |
 
-## 20.3 Tabel `victims`
-
-| Nama Kolom | Tipe Data | Aturan / Keterangan |
-| --- | --- | --- |
-| VictimId | int PK | Auto Increment |
-| QrTokenUuid | varchar(36) | Unik, token acak UUID v4 yang dicetak ke gelang |
-| NikHash | varchar(64) | Hasil enkripsi satu arah SHA-256 dari NIK korban |
-| MaskedName | varchar(10) | Nama inisial samaran korban (contoh: Korban_KS) |
-| EncryptedProfile | text | Data alamat dan telepon yang dienkripsi AES-256 |
-| RegistrationStatus | varchar(20) | Lokal / Luar_Domisili / Ditangguhkan |
-| CreatedAt | datetime | Waktu pendaftaran pertama di posko |
-
-## 20.4 Tabel `vouching_records`
+## 20.3 Tabel `Victim`
 
 | Nama Kolom | Tipe Data | Aturan / Keterangan |
 | --- | --- | --- |
-| VouchId | int PK | Auto Increment |
-| VictimId | int FK | Berelasi ke tabel `victims` |
-| GuarantorName | varchar(100) | Nama lengkap warga lokal atau petugas penjamin |
-| GuarantorNikHash | varchar(64) | Hash KTP dari pihak yang memberikan jaminan |
-| VouchNotes | text | Alasan penjaminan (contoh: Turis, dokumen hilang) |
+| id | Int (PK) | Auto Increment |
+| qrTokenUuid | String | Unik, token acak UUID v4 yang dicetak ke gelang |
+| nikHash | String | Hasil enkripsi satu arah SHA-256 dari NIK korban (Nullable) |
+| isEmergency | Boolean | Menandai alur darurat tanpa dokumen |
+| witnessVictimId | Int (FK) | Berelasi ke tabel `Victim` sendiri (Nullable) |
+| maskedName | String | Nama inisial samaran korban (contoh: Korban_KS) |
+| encryptedProfile | Text | Data alamat, telepon, dan mosaik foto terenkripsi AES-256 |
+| registrationStatus | String | Lokal / Luar_Domisili / Emergency_Unverified |
+| createdAt | DateTime | Waktu pendaftaran pertama di posko |
 
-## 20.5 Tabel `logistic_items`
-
-| Nama Kolom | Tipe Data | Aturan / Keterangan |
-| --- | --- | --- |
-| ItemId | int PK | Auto Increment |
-| ItemName | varchar(100) | Nama barang bantuan (contoh: Beras, Selimut, Air) |
-| Category | varchar(50) | Makanan / Pakaian / Tenda / Kebersihan |
-| CurrentStock | int | Kuantitas sisa stok riil di gudang posko |
-| MinimumThreshold | int | Batas minimum stok sebelum memicu alert sistem |
-| UnitType | varchar(20) | Satuan komoditas (KG / Dus / Pcs / Paket) |
-
-## 20.6 Tabel `logistic_claims`
+## 20.4 Tabel `witnessedVictims`
 
 | Nama Kolom | Tipe Data | Aturan / Keterangan |
 | --- | --- | --- |
-| ClaimId | int PK | Auto Increment |
-| VictimId | int FK | Berelasi ke tabel `victims` |
-| ItemId | int FK | Berelasi ke tabel `logistic_items` |
-| ClaimQuantity | int | Jumlah komoditas yang diserahkan ke korban |
-| ClaimedAt | datetime | Waktu pemindaian dan pengambilan bantuan |
-| OfficerUserId | int FK | Berelasi ke tabel `users` (Petugas Logistik) |
+| id | Int (PK) | Auto Increment |
+| victimId | Int (FK) | Merujuk ke korban darurat tanpa dokumen |
+| witnessId | Int (FK) | Merujuk ke korban lokal pemilik KTP sah selaku saksi |
+| vouchNotes | Text | Catatan deskripsi alasan penjaminan darurat |
 
-## 20.7 Tabel `diseases`
+## 20.5 Tabel `LogisticItem`
 
 | Nama Kolom | Tipe Data | Aturan / Keterangan |
 | --- | --- | --- |
-| DiseaseId | int PK | Auto Increment |
-| DiseaseCode | varchar(10) | Unik, Kode ICD-10 ringkas (contoh: DHF, ISPA) |
-| DiseaseName | varchar(100) | Nama penyakit dalam istilah kedokteran lapangan |
-| RiskLevel | varchar(20) | Rendah / Sedang / Tinggi / Menular Kritis |
+| id | Int (PK) | Auto Increment |
+| itemName | String | Nama komoditas barang bantuan logistik |
+| category | String | Pangan / Sandang / Perlengkapan Tidur |
+| currentStock | Int | Jumlah kuantitas fisik riil sisa di gudang |
+| minimumThreshold | Int | Batas minimum stok sebelum memicu alarm sistem |
+| unitType | String | Satuan barang (KG / Dus / Pcs / Paket) |
 
-## 20.8 Tabel `triage_records`
-
-| Nama Kolom | Tipe Data | Aturan / Keterangan |
-| --- | --- | --- |
-| TriageId | int PK | Auto Increment |
-| ColorCode | varchar(15) | Merah (Kritis) / Kuning / Hijau / Hitam |
-| Description | text | Gejala klinis penentu keputusan klasifikasi |
-
-## 20.9 Tabel `medical_logs`
+## 20.6 Tabel `LogisticClaim`
 
 | Nama Kolom | Tipe Data | Aturan / Keterangan |
 | --- | --- | --- |
-| MedicalLogId | int PK | Auto Increment |
-| VictimId | int FK | Berelasi ke tabel `victims` (Koneksi Anonim) |
-| TriageId | int FK | Berelasi ke tabel `triage_records` |
-| DiseaseId | int FK | Berelasi ke tabel `diseases` |
-| EncryptedClinicalNotes | text | Catatan medis darurat yang dienkripsi AES-256 |
-| ExaminedAt | datetime | Waktu pemeriksaan klinis di tenda medis |
-| DoctorUserId | int FK | Berelasi ke tabel `users` (Petugas Medis) |
+| id | Int (PK) | Auto Increment |
+| victimId | Int (FK) | Berelasi ke tabel `Victim` |
+| itemId | Int (FK) | Berelasi ke tabel `LogisticItem` |
+| claimQuantity | Int | Kuantitas jatah barang bantuan yang diserahkan |
+| claimedAt | DateTime | Waktu pemindaian entitas transaksi bansos |
+| officerUserId | Int (FK) | Berelasi ke tabel `User` selaku operator logistik |
 
-## 20.10 Tabel `medicines`
-
-| Nama Kolom | Tipe Data | Aturan / Keterangan |
-| --- | --- | --- |
-| MedicineId | int PK | Auto Increment |
-| MedicineName | varchar(100) | Nama obat-obatan darurat (contoh: Parasetamol) |
-| CurrentStock | int | Jumlah kuantitas stok butir/botol obat tersedia |
-| ExpiryDate | date | Tanggal kadaluwarsa obat lapangan |
-
-## 20.11 Tabel `medical_prescriptions`
+## 20.7 Tabel `Disease`
 
 | Nama Kolom | Tipe Data | Aturan / Keterangan |
 | --- | --- | --- |
-| PrescriptionId | int PK | Auto Increment |
-| MedicalLogId | int FK | Berelasi ke tabel `medical_logs` |
-| MedicineId | int FK | Berelasi ke tabel `medicines` |
-| DispensedQty | int | Jumlah obat yang diberikan ke pasien |
-| DosageInstruction | varchar(100) | Aturan pakai darurat (contoh: 3x1 Sesudah Makan) |
+| id | Int (PK) | Auto Increment |
+| diseaseCode | String | Unik, Kode ringkas penanda ICD-10 posko krisis |
+| diseaseName | String | Nama jenis penyakit darurat tanggap krisis |
+| riskLevel | String | Tingkat keparahan (Rendah / Sedang / Menular Tinggi) |
 
-## 20.12 Tabel `system_keys`
+## 20.8 Tabel `TriageRecord`
 
 | Nama Kolom | Tipe Data | Aturan / Keterangan |
 | --- | --- | --- |
-| KeyId | int PK | Auto Increment |
-| KeyTokenCipher | text | Token kunci enkripsi utama yang dikunci sistem |
-| KeyStatus | varchar(20) | Aktif_Komando / Terhancurkan_Sadd |
+| id | Int (PK) | Auto Increment |
+| colorCode | String | Kode klasifikasi internasional (Merah/Kuning/Hijau/Hitam) |
+| description | Text | Indikator klinis penentu tingkat keparahan medis |
+
+## 20.9 Tabel `MedicalLog`
+
+| Nama Kolom | Tipe Data | Aturan / Keterangan |
+| --- | --- | --- |
+| id | Int (PK) | Auto Increment |
+| victimId | Int (FK) | Berelasi anonim ke token UUID tabel `Victim` |
+| triageId | Int (FK) | Berelasi ke tabel `TriageRecord` |
+| diseaseId | Int (FK) | Berelasi ke tabel `Disease` |
+| encryptedClinicalNotes | Text | Catatan rekam rekam medis darurat terenkripsi AES-256 |
+| examinedAt | DateTime | Waktu penanganan klinis darurat oleh dokter |
+| doctorUserId | Int (FK) | Berelasi ke tabel `User` penanda dokter pemeriksa |
+
+## 20.10 Tabel `Medicine`
+
+| Nama Kolom | Tipe Data | Aturan / Keterangan |
+| --- | --- | --- |
+| id | Int (PK) | Auto Increment |
+| medicineName | String | Nama pasokan obat-obatan apotek darurat posko |
+| currentStock | Int | Jumlah sisa kuantitas butir/botol stok obat |
+| expiryDate | DateTime | Tanggal batas kedaluwarsa pasokan obat |
+
+## 20.11 Tabel `MedicalPrescription`
+
+| Nama Kolom | Tipe Data | Aturan / Keterangan |
+| --- | --- | --- |
+| id | Int (PK) | Auto Increment |
+| medicalLogId | Int (FK) | Berelasi ke tabel `MedicalLog` |
+| medicineId | Int (FK) | Berelasi ke tabel `Medicine` |
+| dispensedQty | Int | Jumlah volume obat yang diberikan ke pasien |
+| dosageInstruction | String | Aturan regulasi takaran pakai obat harian |
+
+## 20.12 Tabel `SystemKey`
+
+| Nama Kolom | Tipe Data | Aturan / Keterangan |
+| --- | --- | --- |
+| id | Int (PK) | Auto Increment |
+| keyTokenCipher | Text | Parameter enkripsi master lokal di RAM server |
+| keyStatus | String | Indikator status (Aktif_Komando / Terhancurkan_Sadd) |
 
 ---
 
@@ -597,90 +736,85 @@ Sistem SADANA beroperasi menggunakan **11 tabel relasional utama** berikut:
 
 ```mermaid
 erDiagram
-    USERS {
-        int UserId PK
-        string Username
-        string Password
-        string Role
-        string MacAddress
-        bool IsActive
+    USER {
+        int id PK
+        string username
+        string password
+        string role
+        string macAddress
+        bool isActive
     }
-    VICTIMS {
-        int VictimId PK
-        string QrTokenUuid
-        string NikHash
-        string MaskedName
-        string EncryptedProfile
-        string RegistrationStatus
-        datetime CreatedAt
+    VICTIM {
+        int id PK
+        string qrTokenUuid
+        string nikHash
+        bool isEmergency
+        int witnessVictimId FK
+        string maskedName
+        string encryptedProfile
+        string registrationStatus
+        datetime createdAt
     }
-    VOUCHING_RECORDS {
-        int VouchId PK
-        int VictimId FK
-        string GuarantorName
-        string GuarantorNikHash
-        string VouchNotes
+    LOGISTIC_ITEM {
+        int id PK
+        string itemName
+        string category
+        int currentStock
+        int minimumThreshold
+        string unitType
     }
-    LOGISTIC_ITEMS {
-        int ItemId PK
-        string ItemName
-        string Category
-        int CurrentStock
-        int MinimumThreshold
-        string UnitType
+    LOGISTIC_CLAIM {
+        int id PK
+        int victimId FK
+        int itemId FK
+        int claimQuantity
+        datetime claimedAt
+        int officerUserId FK
     }
-    LOGISTIC_CLAIMS {
-        int ClaimId PK
-        int VictimId FK
-        int ItemId FK
-        int ClaimQuantity
-        datetime ClaimedAt
-        int OfficerUserId FK
+    DISEASE {
+        int id PK
+        string diseaseCode
+        string diseaseName
+        string riskLevel
     }
-    DISEASES {
-        int DiseaseId PK
-        string DiseaseCode
-        string DiseaseName
-        string RiskLevel
+    TRIAGE_RECORD {
+        int id PK
+        string colorCode
+        string description
     }
-    TRIAGE_RECORDS {
-        int TriageId PK
-        string ColorCode
-        string Description
+    MEDICAL_LOG {
+        int id PK
+        int victimId FK
+        int triageId FK
+        int diseaseId FK
+        string encryptedClinicalNotes
+        datetime examinedAt
+        int doctorUserId FK
     }
-    MEDICAL_LOGS {
-        int MedicalLogId PK
-        int VictimId FK
-        int TriageId FK
-        int DiseaseId FK
-        string EncryptedClinicalNotes
-        datetime ExaminedAt
-        int DoctorUserId FK
+    MEDICINE {
+        int id PK
+        string medicineName
+        int currentStock
+        datetime expiryDate
     }
-    MEDICINES {
-        int MedicineId PK
-        string MedicineName
-        int CurrentStock
-        date ExpiryDate
-    }
-    MEDICAL_PRESCRIPTIONS {
-        int PrescriptionId PK
-        int MedicalLogId FK
-        int MedicineId FK
-        int DispensedQty
-        string DosageInstruction
+    MEDICAL_PRESCRIPTION {
+        int id PK
+        int medicalLogId FK
+        int medicineId FK
+        int dispensedQty
+        string dosageInstruction
     }
 
-    USERS ||--o{ LOGISTIC_CLAIMS : processes
-    USERS ||--o{ MEDICAL_LOGS : examines
-    VICTIMS ||--o| VOUCHING_RECORDS : required_for
-    VICTIMS ||--o{ LOGISTIC_CLAIMS : receives
-    VICTIMS ||--o{ MEDICAL_LOGS : undergoes
-    LOGISTIC_ITEMS ||--o{ LOGISTIC_CLAIMS : included_in
-    TRIAGE_RECORDS ||--o{ MEDICAL_LOGS : categorizes
-    DISEASES ||--o{ MEDICAL_LOGS : standardizes
-    MEDICAL_LOGS ||--o{ MEDICAL_PRESCRIPTIONS : contains
-    MEDICINES ||--o{ MEDICAL_PRESCRIPTIONS : supplied_by
+    USER ||--o{ LOGISTIC_CLAIM : "processes"
+    USER ||--o{ MEDICAL_LOG : "examines"
+    VICTIM ||--o{ VICTIM : "vouch_for / witness"
+    VICTIM ||--o{ LOGISTIC_CLAIM : "receives"
+    VICTIM ||--o{ MEDICAL_LOG : "undergoes"
+    LOGISTIC_ITEM ||--o{ LOGISTIC_CLAIM : "included_in"
+    TRIAGE_RECORD ||--o{ MEDICAL_LOG : "categorizes"
+    DISEASE ||--o{ MEDICAL_LOG : "standardizes"
+    MEDICAL_LOG ||--o{ MEDICAL_PRESCRIPTION : "contains"
+    MEDICINE ||--o{ MEDICAL_PRESCRIPTION : "supplied_by"
 
 ```
 
@@ -690,61 +824,49 @@ erDiagram
 
 ## 22.1 Encapsulation (Enkapsulasi)
 
-Seluruh kelas data model tidak diizinkan mengekspos variabel internalnya secara publik. Modifikasi data wajib melalui metode setter khusus yang divalidasi. Contoh: Kelas `Medicine` melundungi properti `CurrentStock` sehingga pengurangan stok akibat pemberian resep obat tidak bisa bernilai minus. Status enkripsi pada kelas `Victim` ditangani secara internal pada level siklus hidup enkapsulasi objek model sebelum operasi tulis basis data dipanggil.
+Seluruh kelas dan modul penanganan database Next.js tidak diizinkan mengekspos variabel internalnya secara bebas. Perubahan data inventaris stok obat atau data status token gelang hanya dapat dimodifikasi melalui method enkapsulasi terstruktur di dalam file `/services/databaseService.ts`. Keamanan enkripsi master key diisolasi secara internal di memori RAM dan tidak ditulis ke media SSD.
 
-## 22.2 Inheritance (Pewarisan)
+## 22.2 Component Composition (Padanan Inheritance)
 
-Pewarisan struktur diimplementasikan untuk mengelola hak otentikasi pengguna sistem dan profil personil lapangan.
+Pewarisan rute dan otorisasi menu visual di sisi React Next.js diselesaikan menggunakan pola komposisi komponen (*Component Composition*) untuk mewarisi fungsionalitas menu navigasi dan keamanan dasbor secara dinamis:
 
-### Sektor Kelas Akun Sistem:
-
-* `BaseUserAccount` (Abstract Class)
-* `CommandUserAccount` (Subclass Komandan Posko)
-* `RegistrationUserAccount` (Subclass Petugas Registrasi)
-* `LogisticUserAccount` (Subclass Petugas Logistik)
-* `MedicalUserAccount` (Subclass Petugas Medis)
-
-
-
-### Sektor Kelas Profil Kemanusiaan:
-
-* `HumanProfile` (Abstract Class)
-* `OfficerProfile` (Subclass Profil Lengkap Petugas)
-* `SecureVictimProfile` (Subclass Profil Aman Korban Terenkripsi)
+* `<DashboardLayout>` (Root Component)
+* `<RoleProtectedRoute role="Komandan">` -> Menampilkan panel komandan
+* `<RoleProtectedRoute role="Logistik">` -> Menampilkan scanner logistik
 
 
 
 ## 22.3 Polymorphism (Polimorfisme)
 
-Polimorfisme digunakan pada sistem otorisasi visual antarmuka dasbor. Method `RenderDashboardInterface()` yang dideklarasikan pada abstract class `BaseUserAccount` akan menghasilkan struktur menu navigasi, hak edit data, dan skema warna dasbor yang sepenuhnya berbeda pada masing-masing subclass petugas saat dipanggil oleh mesin rendering Laravel Livewire di lapangan.
+Polimorfisme diterapkan pada element antarmuka dashboard. Fungsi routing di Next.js middleware me-render menu navigasi, tombol aksi, dan grafik analitik yang berbeda secara dinamis berdasarkan penguraian payload role JWT token yang terdeteksi aktif saat sesi login petugas.
 
 ## 22.4 Abstraction (Abstraksi)
 
-Abstraksi diwujudkan melalui arsitektur pemisahan *Interface Service Layer* dan *Repository Pattern*. Kelas pengontrol UI tidak pernah tahu bagaimana logika database ditulis atau bagaimana data dienkripsi fisik. Pengontrol hanya berkomunikasi dengan interface abstrak seperti `ISecurityCryptoService`, `ILogisticManagementService`, dan `IMedicalEmergencyService`.
+Abstraksi diwujudkan melalui arsitektur pemisahan *Interface Service Layer* dan *Prisma Client*. Handler UI Next.js (Server Actions) tidak pernah mengetahui bagaimana kueri SQL ditulis atau bagaimana database melakukan enkripsi. Presentasi UI murni hanya memanggil rute aksi asinkronus abstrak seperti `registerVictimAction()` atau `processClaimAction()`.
 
 ---
 
 # 23. Daftar Class Utama Sistem
 
-## 23.1 BaseUserAccount (Abstract Class)
+## 23.1 BaseUserAccount (Abstract Class / Padanan Model)
 
-* **Atribut:** `int id`, `string username`, `string role`, `string macAddress`, `bool isActive`
-* **Method:** `abstract public function RenderDashboardInterface()`, `public function ValidateDeviceBound()`
+* **Atribut:** `id: number`, `username: string`, `role: string`, `macAddress: string`, `isActive: boolean`
+* **Method:** `abstract renderDashboardInterface(): void`, `validateDeviceBound(): boolean`
 
 ## 23.2 SecureVictimProfile (Class)
 
-* **Atribut:** `string qrToken`, `string hashNik`, `string maskedName`, `string rawEncryptedBlob`
-* **Method:** `public function GenerateTokenWristband()`, `public function ApplyDataMasking()`, `public function DecryptProfileData(string $ramKey)`
+* **Atribut:** `qrTokenUuid: string`, `nikHash: string`, `isEmergency: boolean`, `maskedName: string`, `encryptedProfile: string`
+* **Method:** `generateTokenWristband(): string`, `applyDataMasking(): void`, `decryptProfileData(ramKey: string): string`
 
 ## 23.3 HighSecurityCryptoEngine (Class)
 
-* **Atribut:** `private $cipherAlgorithm`, `private $masterKeySystem`
-* **Method:** `public static function ComputeSha256(string $input)`, `public function EncryptSymetric(string $plaintext)`, `public function ExecuteCryptoShredding()`
+* **Atribut:** `private cipherAlgorithm: string`, `private masterKeySystem: Buffer`
+* **Method:** `static computeSha256(input: string): string`, `encryptSymmetric(plaintext: string): string`, `executeCryptoShredding(): void`
 
 ## 23.4 EmergencyMedicalUnit (Class)
 
-* **Atribut:** `int logId`, `string triageLevel`, `string clinicalDiagnosisCode`
-* **Method:** `public function AssignTriageColor()`, `public function AppendPrescription(int $medicineId, int $qty)`
+* **Atribut:** `medicalLogId: number`, `triageLevel: string`, `clinicalDiagnosisCode: string`
+* **Method:** `assignTriageColor(): string`, `appendPrescription(medicineId: number, qty: number): void`
 
 ---
 
@@ -818,38 +940,26 @@ classDiagram
 sequenceDiagram
     autonumber
     actor L as Petugas Logistik
-    participant V as View: DasborLogistik
-    participant S as Service: LogisticManagementService
-    participant R as Repo: VictimRepository
-    participant I as Repo: InventoryRepository
-    participant DB as Database Lokal
+    participant V as React UI: DashboardLogistik
+    participant S as Next.js API: /api/claims/verify
+    participant R as Engine: CryptoEngineService
+    participant DB as Database SQLite
 
-    L->>V: Pindai Gelang QR Korban
-    V->>S: ProcessLogisticClaim(qrTokenUuid, itemId, qty)
-    S->>R: FindVictimByToken(qrTokenUuid)
-    R->>DB: SQL Query Token UUID
-    DB-->>R: Object Victim (Masked & Encrypted)
-    R-->>S: Victim Data Found
-    S->>S: Cek Duplikasi Klaim Hari Ini (Tabel claims)
-    alt Korban Sudah Mengambil Hari Ini
-        S-->>V: Return Error "Double Claim Detected!"
-        V-->>L: Bunyikan Alarm Merah Dasbor
+    L->>V: Pindai Gelang QR via Kamera Laptop
+    V->>S: HTTP POST /api/claims/verify (UUID, itemId)
+    S->>DB: Prisma.victim.findUnique(UUID)
+    DB-->>S: Record Korban Ditemukan
+    S->>DB: Prisma.logisticClaim.findFirst(Hari Ini)
+    DB-->>S: Record Transaksi Klaim
+    alt Korban Terdeteksi Sudah Mengambil Bansos Hari ini
+        S-->>V: HTTP Response 400 (Double Claim Error Object)
+        V-->>L: React State Trigger Border Merah + Alarm Suara
     else Kelayakan Klaim Valid (Belum Ambil)
-        S->>I: CheckStockSufficient(itemId, qty)
-        I->>DB: Query Stok Sisa Barang
-        DB-->>I: Kuantitas Stok Tersedia
-        alt Stok Gudang Cukup
-            I-->>S: Stok Valid
-            S->>I: ReduceStockValue(itemId, qty)
-            I->>DB: SQL Update Stock Inventory
-            S->>S: Log Histori ke Tabel claims
-            S-->>V: Return Success "Bantuan Siap Diserahkan"
-            V-->>L: Tampilkan Status Hijau Sukses
-        else Stok Gudang Kosong
-            I-->>S: Stok Kritis / Habis
-            S-->>V: Return Error "Stok Gudang Tidak Cukup"
-            V-->>L: Tampilkan Alert Peringatan Logistik
-        end
+        S->>DB: Prisma.logisticItem.update(Decrement Stock)
+        S->>DB: Prisma.logisticClaim.create()
+        DB-->>S: Prisma Operation Success
+        S-->>V: HTTP Response 200 (Success Object)
+        V-->>L: UI React State Table Update Menjadi Hijau Sukses
     end
 
 ```
@@ -858,128 +968,180 @@ sequenceDiagram
 
 # 26. Diagram Status (State Diagram)
 
-## 26.1 Siklus Hidup Token QR Gelang Korban (Track III)
+## 26.1 State Management Status Gelang Korban pada React
 
 ```mermaid
 stateDiagram-v2
-    [*] --> MenungguVerifikasi : Data Diinput Registrasi
-    MenungguVerifikasi --> Aktif : Cetak QR Gelang Berhasil
-    Aktif --> Terklaim : Scan Logistik Berhasil (Siklus Harian)
-    Terklaim --> Aktif : Reset Parameter Waktu Hari Baru
-    Aktif --> Ditangguhkan : Gelang Dilaporkan Hilang/Rusak
-    Ditangguhkan --> Aktif : Gelang Ditemukan / Re-issue Token
-    Aktif --> Terhancurkan : Misi Selesai / Perintah Crypto-Shredding
-    Ditangguhkan --> Terhancurkan : Perintah Crypto-Shredding
-    Terklaim --> Terhancurkan : Perintah Crypto-Shredding
-    Terhancurkan --> [*]
+    [*] --> UnverifiedState : Form Input Pertama
+    UnverifiedState --> ActiveState : Express API Berhasil Generate UUID
+    ActiveState --> ClaimedState : Pemindaian Logistik Sukses (Siklus Harian)
+    ClaimedState --> ActiveState : Reset Interval Waktu Otomatis
+    ActiveState --> RevokedState : Tombol Blokir Diklik di React UI
+    RevokedState --> ActiveState : Cetak Ulang Token Gelang Baru
+    ActiveState --> ShreddedState : Trigger Fitur Crypto-Shredding Berhasil
+    RevokedState --> ShreddedState : Trigger Fitur Crypto-Shredding Berhasil
+    ClaimedState --> ShreddedState : Trigger Fitur Crypto-Shredding Berhasil
+    ShreddedState --> [*]
+
+```
+
+## 26.2 Status Kunjungan Posko Kesehatan Lapangan
+
+```mermaid
+stateDiagram-v2
+    [*] --> AntreanMenunggu
+    AntreanMenunggu --> ProsesPemeriksaan : QR Code Di-scan Dokter
+    ProsesPemeriksaan --> PenulisanResep : Input Diagnosa Selesai
+    PenulisanResep --> SelesaiTertangani : Simpan Rekam Medis & Kurangi Stok
+    SelesaiTertangani --> [*]
 
 ```
 
 ---
 
-# 27. Struktur Arsitektur Proyek (Laravel Core Clean Stack)
-
-Struktur direktori proyek SADANA diatur secara terintegrasi menggunakan komponen berbasis Service-Repository agar memudahkan pengerjaan kolaborasi 2 orang dibantu AI Agent secara paralel:
+# 27. Struktur Arsitektur Proyek (Next.js Clean Stack)
 
 ```text
-SADANA/
+SADANA_NEXTJS/
 ├── app/
-│   ├── Actions/
-│   │   └── Fortify/
-│   ├── Helpers/
-│   │   ├── CryptoHelper.php
-│   │   ├── NetworkMeshHelper.php
-│   │   └── TriageColorHelper.php
-│   ├── Http/
-│   │   ├── Controllers/
-│   │   │   └── LocalSyncController.php
-│   │   └── Livewire/
-│   │       ├── DashboardCommand.php
-│   │       ├── DashboardRegistration.php
-│   │       ├── DashboardLogistic.php
-│   │       ├── DashboardMedical.php
-│   │       ├── VictimRegistrationForm.php
-│   │       ├── LogisticScanner.php
-│   │       └── MedicalTriageUnit.php
-│   ├── Models/
-│   │   ├── User.php
-│   │   ├── Victim.php
-│   │   ├── VouchingRecord.php
-│   │   ├── LogisticItem.php
-│   │   ├── LogisticClaim.php
-│   │   ├── Disease.php
-│   │   ├── MedicalLog.php
-│   │   ├── Medicine.php
-│   │   └── Prescription.php
-│   ├── Repositories/
-│   │   ├── BaseRepositoryInterface.php
-│   │   ├── UserRepository.php
-│   │   ├── VictimRepository.php
-│   │   ├── LogisticRepository.php
-│   │   └── MedicalRepository.php
-│   └── Services/
-│       ├── SecurityCryptoService.php
-│       ├── LogisticManagementService.php
-│       └── MedicalEmergencyService.php
-├── database/
-│   ├── migrations/
-│   │   ├── 2026_06_01_000001_create_users_table.php
-│   │   ├── 2026_06_01_000002_create_victims_table.php
-│   │   ├── 2026_06_01_000003_create_vouching_records_table.php
-│   │   ├── 2026_06_01_000004_create_logistic_items_table.php
-│   │   ├── 2026_06_01_000005_create_logistic_claims_table.php
-│   │   └── 2026_06_01_000006_create_medical_logs_table.php
-│   └── seeders/
-├── info/
-│   └── GuideBook_Web_Development.pdf
-├── resources/
-│   └── views/
-│       ├── layouts/
-│       │   └── app.blade.php
-│       └── livewire/
-│           ├── dashboard-command.blade.php
-│           ├── dashboard-registration.blade.php
-│           ├── dashboard-logistic.blade.php
-│           ├── dashboard-medical.blade.php
-│           └── components/
-│               └── scan-alert-modal.blade.php
-├── routes/
-│   └── web.php
-└── tailwind.config.js
+│   ├── api/
+│   │   ├── auth/
+│   │   │   └── route.ts         # Endpoint login & otentikasi JWT
+│   │   ├── claims/
+│   │   │   └── verify/
+│   │   │       └── route.ts     # API validasi klaim ganda bansos
+│   │   └── medical/
+│   │       └── route.ts         # API rekam medis anonim
+│   ├── command/
+│   │   ├── layout.tsx           # Layout navigasi khusus komandan
+│   │   └── page.tsx             # Dasbor grafik Recharts admin
+│   ├── logistic/
+│   │   └── page.tsx             # Halaman scanner web petugas logistik
+│   ├── medical/
+│   │   └── page.tsx             # Halaman triage & input obat dokter
+│   ├── registration/
+│   │   └── page.tsx             # Halaman form pendaftaran korban
+│   ├── layout.tsx               # Root layout HTML & Font config
+│   ├── middleware.ts            # Route guard JWT global Next.js
+│   └── page.tsx                 # Halaman login petugas utama
+├── components/
+│   ├── ui/
+│   │   ├── alert-modal.tsx      # Modal notifikasi error/sukses
+│   │   ├── button.tsx           # Komponen tombol standard Tailwind
+│   │   └── table.tsx            # Komponen tabel visual kontras tinggi
+│   ├── QrScanner.tsx            # Modul kamera html5-qrcode
+│   └── TriageRadio.tsx          # Komponen radio button triage medis
+├── hooks/
+│   └── useIndexedDb.ts          # Sinkronisasi antrean data offline
+├── prisma/
+│   ├── sadana_local.db          # File SQLite database utama lokal
+│   └── schema.prisma            # Skema relasional data model
+├── services/
+│   ├── cryptoEngine.ts          # Mesin enkripsi & hashing SHA-256
+│   └── databaseService.ts       # Service layer penanganan kueri database
+├── package.json
+├── tailwind.config.js
+└── vite.config.js
 
 ```
 
 ---
 
-# 28. Desain Tampilan Antarmuka (UI Design)
+# 28. Desain Tampilan UI
 
-## 28.1 Palet Warna Keselamatan & Keamanan Posko
+## 28.1 Konsep UI
 
-Desain visual mengutamakan kejelasan tingkat tinggi (*high-contrast accessibility*) demi kenyamanan mata petugas di lapangan yang bekerja di bawah kondisi ekstrem.
+Tampilan sistem menggunakan konsep *high-contrast safety UI* yang bersih, modern, kontras tinggi, mudah dibaca di bawah sinar matahari posko lapangan darurat, serta fokus penuh pada keterbacaan data taktis.
 
-| Nama Elemen UI | Kode Hex Warna | Representasi Psikologis Visual |
-| --- | --- | --- |
-| **Primary Blue** | `#0B1E36` | Biru Navy Tua Komando: Tegas, Profesional, Resmi |
-| **Rescue Orange** | `#FF6B00` | Orange Rescue: Identitas Penyelamatan, Aksi Cepat |
-| **Light Alert Background** | `#F0F5FA` | Abu-Abu Putih Bersih: Nyaman Dibaca, Fokus Data |
-| **Card Panel Bright** | `#FFFFFF` | Putih Murni: Kontras Maksimal Terhadap Teks |
-| **Text Dark Core** | `#050F1A` | Hitam Gelap Pekat: Memudahkan Pembacaan Cepat |
-| **Text Secondary Muted** | `#526273` | Abu-Abu Redup: Keterangan Tambahan / Sub-Judul |
+## 28.2 Palet Warna Keselamatan & Keamanan Posko
 
-## 28.2 Sistem Indikator Status Warna Triage Medis & Logistik
+```javascript
+// tailwind.config.js
+module.exports = {
+  theme: {
+    extend: {
+      colors: {
+        primaryBlue: '#0B1E36',   // Biru Navy Tua Komando
+        rescueOrange: '#FF6B00',  // Orange Penyelamatan BNPB
+        safetyGreen: '#10B981',   // Hijau Status Valid
+        alertRed: '#EF4444',      // Merah Triage Kritis
+        brightPanel: '#FFFFFF',   // Putih Bersih Kontras
+        darkText: '#050F1A'       // Hitam Pekat Keterbacaan Tinggi
+      }
+    }
+  }
+}
 
-| Kondisi Operasional Lapangan | Warna Badge Visual | Tampilan Hex Kode |
-| --- | --- | --- |
-| Status Aman / Klaim Valid / Triage Hijau | Hijau Sukses | `#10B981` |
-| Peringatan / Klaim Ganda Terdeteksi / Triage Kuning | Kuning Peringatan | `#F59E0B` |
-| Bahaya Kritis / Stok Habis / Triage Merah | Merah Darurat | `#EF4444` |
-| Token Ditangguhkan / Korban Meninggal (Triage Hitam) | Hitam Absolut | `#111827` |
+```
+
+## 28.3 Komponen UI yang Disarankan
+
+* Sidebar menu vertikal navigasi taktis berwarna gelap.
+* Header panel status whitelisting perangkat keras.
+* Card statistik Recharts ringkasan komoditas logistik.
+* Badge status fungsional dengan warna indikator keselamatan.
+* DataGridView ringkasan log claims harian posko.
+
+## 28.4 Warna Status Indikator Lapangan
+
+* Status Aman / Klaim Valid / Triage Hijau: `#10B981` (badge hijau)
+* Peringatan / Klaim Ganda Terdeteksi / Triage Kuning: `#F59E0B` (badge kuning)
+* Bahaya Kritis / Stok Habis / Triage Merah: `#EF4444` (badge merah)
+* Token Ditangguhkan / Korban Meninggal (Triage Hitam): `#111827` (badge hitam)
 
 ---
 
-# 29. Rekomendasi Layout Komponen Dasbor
+# 29. Rekomendasi Layout Dashboard
 
-## 29.1 Tata Letak Dasbor Petugas Logistik (Tenda Pembagian Bansos)
+## 29.1 Layout Dashboard Komandan Posko (Pusat Kendali)
+
+```text
++-----------------------------------------------------------------------------+
+| SADANA | DASBOR KOMANDAN PUSAT KENDALI                   [Admin: Budi_Kom]  |
++-----------------------------------------------------------------------------+
+| METRIK UTAMA:                                                               |
+| [ Total Korban: 1,420 ]    [ Regular: 1,120 ]    [ Emergency Mode: 300 ]    |
+| [ Ketahanan Pangan: 12 Hari ]                     [ Petugas Aktif: 8 Org ]  |
+|-----------------------------------------------------------------------------|
+| TREN EPIDEMIOLOGI PENYAKIT (RECHARTS):     | ALERT LOGISTIK KRITIS:         |
+| (Grafik batang sebaran penyakit tertinggi) | - Beras Posko 1 : Sisa 10 KG!  |
+| - ISPA   : [====================] 124 Ksus | - Vaksin Tetanus: Sisa 5 Vial! |
+| - Diare  : [==============] 85 Kasus       |                                |
+| - DBD    : [========] 40 Kasus             | [ TOMBOL: SINKRONISASI CLOUD ] |
+|-----------------------------------------------------------------------------|
+| PANEL DARURAT KEAMANAN:                                                     |
+| [ !!! TOMBOL MERAH: AKHIRI MISI & HANCURKAN KUNCI KRIPTOGRAFI LOKAL !!! ]   |
++-----------------------------------------------------------------------------+
+
+```
+
+## 29.2 Layout Dashboard Petugas Medis (Tenda Kesehatan)
+
+```text
++-----------------------------------------------------------------------------+
+| SADANA | POS KESEHATAN LAPANGAN DARURAT                  [Dokter: Rian_Med] |
++-----------------------------------------------------------------------------+
+| ANTRIAN PASIEN MEDIS:                                                       |
+| No | Token Gelang QR  | Status Triage  | Status Antrean | Aksi              |
+| 1  | #f81d4fae-7dec   | Merah (Kritis) | Menunggu       | [ PROSES PERIKSA ]|
+| 2  | #a765-00a0c91e   | Hijau (Ringan) | Sedang Periksa | [ LIHAT DETAIL ]  |
+|-----------------------------------------------------------------------------|
+| [PANEL PEMERIKSAAN AKTIF - PASIEN #f81d4fae-7dec]                           |
+| Inisial: Korban_KS    | Umur: 42 Thn   | Alergi Obat: [ Penisilin ]         |
+|                                                                             |
+| Tingkat Triage: [ (O) MERAH ]   [ ( ) KUNING ]   [ ( ) HIJAU ]   [ ( ) HITAM ]|
+| Diagnosis Penyakit: [ ISPA-01 - Infeksi Saluran Pernapasan Akut          | ]|
+| Catatan Tindakan  : [ Oksigenasi kanula hidung 3 lpm, injeksi antipiretik  ]|
+|                                                                             |
+| Resep Obat Lapangan:                                                        |
+| [ Parasetamol 500mg ] -> Jumlah: [ 10 ] Butir -> Aturan: [ 3x1 Sesudah Mkn ]|
+|                                                                             |
+| [ TOMBOL: SIMPAN REKAM MEDIS DARURAT & KURANGI STOK APOTEK LOKAL ]          |
++-----------------------------------------------------------------------------+
+
+```
+
+## 29.3 Layout Dashboard Petugas Logistik (Tenda Pembagian Bansos)
 
 ```text
 +-----------------------------------------------------------------------------+
@@ -987,7 +1149,7 @@ Desain visual mengutamakan kejelasan tingkat tinggi (*high-contrast accessibilit
 +-----------------------+-----------------------------------------------------+
 | MENU NAVIGASI         | ZONA LIVE SCANNER WEBCAM (AKTIF)                     |
 | [*] Dasbor Utama      | +-------------------------------------------------+ |
-| [ ] Master Stok       | | [KAMERA SCANNER MEMINDAI TOKEN GELANG QR...]   | |
+| [ ] Master Stok       | | [KAMERA COMPONENT REACT HTML5-QRCODE ACTIVE...] | |
 | [ ] Log Klaim Harian  | +-------------------------------------------------+ |
 |                       | Status Deteksi Terakhir: [ KLAIM VALID - HIJAU ]    |
 |-----------------------+-----------------------------------------------------|
@@ -1001,65 +1163,90 @@ Desain visual mengutamakan kejelasan tingkat tinggi (*high-contrast accessibilit
 
 ---
 
-# 30. Query Data Dasbor yang Disarankan (Eloquent Pseudocode)
+# 30. Query Data Dasbor yang Disarankan
 
-Untuk memastikan performa aplikasi web berjalan ringan di server portabel berspesifikasi rendah, query analitik menggunakan agregasi efisien:
+Akselerasi kueri asinkronus Next.js API Routes / Server Actions untuk pengolahan transaksional aman:
 
-## 30.1 Perhitungan Metrik Ringkas Dasbor Komandan
+## 30.1 Perhitungan Metrik Ringkas Dasbor Komandan (Server Action)
 
-```php
-// Menghitung jumlah korban berhak menerima bansos hari ini tanpa mengekspos data pribadi
-$totalKorbanTerdata = Victim::where('registration_status', '!=', 'Ditangguhkan')->count();
+```typescript
+import { PrismaClient } from '@prisma/client';
+const prisma = new PrismaClient();
 
-// Alert stok logistik kritis di bawah batas ambang minimum
-$itemKritisAlert = LogisticItem::whereRaw('current_stock <= minimum_threshold')->get();
+export async function getCommanderMetrics() {
+  // Hitung jumlah korban berhak menerima bantuan harian
+  const totalVictims = await prisma.victim.count({
+    where: { registrationStatus: { not: 'Ditangguhkan' } }
+  });
 
-// Menghitung grafik tren infeksi penyakit menular tertinggi di posko medis harian
-$trenPenyakit = MedicalLog::select('disease_id', DB::raw('count(*) as total'))
-    ->whereDate('examined_at', Carbon::today())
-    ->groupBy('disease_id')
-    ->orderBy('total', 'desc')
-    ->take(5)
-    ->get();
+  // Ambil data logistik kritis di bawah ambang batas minimum threshold
+  const criticalItems = await prisma.logisticItem.findMany({
+    where: {
+      currentStock: { lte: prisma.logisticItem.fields.minimumThreshold }
+    }
+  });
+
+  return { totalVictims, criticalItems };
+}
 
 ```
 
-## 30.2 Pencegahan Klaim Ganda pada Controller Pos Logistik
+## 30.2 API Endpoint Pencegahan Klaim Ganda pada Server Next.js
 
-```php
-public function verifyAndProcessClaim($scannedToken, $requestedItemId, $officerId)
-{
-    $victim = Victim::where('qr_token_uuid', $scannedToken)->first();
-    
-    if (!$victim) {
-        return response()->json(['status' => 'ERROR', 'message' => 'Token Tidak Dikenali!']);
+```typescript
+// app/api/claims/verify/route.ts
+import { NextResponse } from 'next/server';
+import { PrismaClient } from '@prisma/client';
+const prisma = new PrismaClient();
+
+export async function POST(request: Request) {
+  const { scannedToken, requestedItemId, officerId } = await request.json();
+
+  const victim = await prisma.victim.findUnique({
+    where: { qrTokenUuid: scannedToken }
+  });
+
+  if (!victim) {
+    return NextResponse.json({ status: 'ERROR', message: 'Token Gelang Tidak Valid!' }, { status: 404 });
+  }
+
+  // Cek duplikasi klaim harian memanfaatkan tanggal hari ini
+  const todayStart = new Date();
+  todayStart.setHours(0,0,0,0);
+
+  const alreadyClaimed = await prisma.logisticClaim.findFirst({
+    where: {
+      victimId: victim.id,
+      itemId: requestedItemId,
+      claimedAt: { gte: todayStart }
     }
+  });
 
-    // Query mengecek apakah token ini sudah mengambil jenis barang yang sama hari ini
-    $alreadyClaimed = LogisticClaim::where('victim_id', $victim->id)
-        ->where('item_id', $requestedItemId)
-        ->whereDate('claimed_at', Carbon::today())
-        ->exists();
+  if (alreadyClaimed) {
+    return NextResponse.json({ status: 'WARNING', message: 'Double Claim Terdeteksi!' }, { status: 400 });
+  }
 
-    if ($alreadyClaimed) {
-        return response()->json(['status' => 'WARNING', 'message' => 'Double Claim Terdeteksi!']);
-    }
+  // Jalankan Transaction Database Aman untuk mengamankan data stok gudang lokal
+  const claimResult = await prisma.$transaction(async (tx) => {
+    const item = await tx.logisticItem.findUnique({ where: { id: requestedItemId } });
+    if (!item || item.currentStock < 1) throw new Error('Stok komoditas habis!');
 
-    // Eksekusi pemotongan stok jika lolos validasi klaim ganda
-    return DB::transaction(function () use ($victim, $requestedItemId, $officerId) {
-        $item = LogisticItem::lockForUpdate()->find($requestedItemId);
-        $item->decrement('current_stock', 1);
-
-        LogisticClaim::create([
-            'victim_id' => $victim->id,
-            'item_id' => $requestedItemId,
-            'claim_quantity' => 1,
-            'claimed_at' => Carbon::now(),
-            'officer_user_id' => $officerId
-        ]);
-
-        return response()->json(['status' => 'SUCCESS', 'message' => 'Klaim Berhasil Disimpan.']);
+    await tx.logisticItem.update({
+      where: { id: requestedItemId },
+      data: { currentStock: item.currentStock - 1 }
     });
+
+    return await tx.logisticClaim.create({
+      data: {
+        victimId: victim.id,
+        itemId: requestedItemId,
+        claimQuantity: 1,
+        officerUserId: officerId
+      }
+    });
+  });
+
+  return NextResponse.json({ status: 'SUCCESS', data: claimResult });
 }
 
 ```
@@ -1068,71 +1255,101 @@ public function verifyAndProcessClaim($scannedToken, $requestedItemId, $officerI
 
 # 31. Pembagian Tugas Kelompok (2 Orang + AI Agent)
 
-## 31.1 Anggota Tim 1 — Core Architect, Security & Back-End Engine
+## 31.1 Anggota Tim 1 — Core Architect, Security & Prisma Database
 
 * **Fokus Kerja:**
-* Inisialisasi framework Laravel, setup struktur database, dan penulisan file migrasi tabel relasional.
-* Implementasi sistem keamanan kriptografi: Algoritma hash SHA-256 untuk NIK dan enkripsi AES-256 pada `SecurityCryptoService`.
-* Merekayasa logika anti-klaim ganda memanfaatkan transaksi database aman (`DB::transaction`).
-* Membangun fungsi destruktif *Crypto-Shredding Engine* pada kontrol utama admin.
+* Inisialisasi framework Next.js, penulisan file `schema.prisma`, dan generate database lokal SQLite.
+* Penulisan modul backend `cryptoEngine.ts` (SHA-256 Hashing NIK & Enkripsi AES-256 untuk Blob gambar wajah darurat).
+* Pembuatan Next.js API Routes untuk otorisasi klaim bansos logistik dan rekam medis darurat.
+* Pembuatan fungsi destruktif Server Actions *Crypto-Shredding* untuk Admin utama.
 
 
-* **Tanggung Jawab File Model & Service:** `User.php`, `Victim.php`, `VouchingRecord.php`, `SecurityCryptoService.php`.
 
-## 31.2 Anggota Tim 2 — UI/UX Master, Front-End & Livewire Scanner
+## 31.2 Anggota Tim 2 — Front-End React Component & Scanner Integrator
 
 * **Fokus Kerja:**
-* Konfigurasi framework Tailwind CSS sesuai dengan palet warna *High-Contrast Safety*.
-* Slicing layout antarmuka visual komponen dasbor berdasarkan variasi role petugas kemanusiaan.
-* Mengintegrasikan library Javascript kamera scanner untuk membaca QR Code gelang korban secara langsung di halaman browser.
-* Membangun komponen form input pendaftaran korban krisis yang dinamis menggunakan Laravel Livewire.
-* Menampilkan notifikasi modal darurat (*Alert Popup Animations*) jika sistem mendeteksi kegagalan stok atau indikasi klaim kecurangan ganda.
+* Setup file konfigurasi Tailwind CSS sesuai palet warna kontras tinggi keselamatan.
+* Slicing layout dashboard responsive Next.js untuk semua variasi role petugas lapangan.
+* Mengintegrasikan webcam client-side capture pada Form Registrasi Darurat dan component QR Scanner menggunakan library html5-qrcode.
+* Mengelola sinkronisasi local state React UI terhadap data endpoints API via Fetch/Axios.
 
 
-* **Tanggung Jawab Komponen Presentasi:** `layouts/app.blade.php`, `dashboard-logistic.blade.php`, `MedicalTriageUnit.php`, `UiHelper.php`.
 
 ---
 
 # 32. Skenario Jalannya Demo Presentasi Juri FIT Competition 2026
 
-Untuk memikat dewan juri secara maksimal, demo aplikasi dipresentasikan melalui alur skenario operasional lapangan end-to-end berikut:
+## Skenario 1 — Jalur Petugas Registrasi (Registrasi Korban Tanpa Dokumen)
 
-1. **Simulasi Krisis & Registrasi Korban:** Anggota Tim 2 bertindak sebagai korban dari luar daerah yang kehilangan KTP. Anggota Tim 1 (sebagai petugas) mendatanya melalui menu *Vouching System* dengan jaminan ID warga lokal. Juri diperlihatkan layar *back-end* database tempat nomor identitas terbukti langsung berubah menjadi deretan kode hash terenkripsi aman (SHA-256).
-2. **Penerbitan Token Fisik:** Sistem sukses memproses pendaftaran dan mencetak QR Code unik pada layar dasbor (mensimulasikan pencetakan gelang fisik).
-3. **Uji Coba Distribusi & Deteksi Kecurangan (Double Claim):** Token QR tersebut kemudian dipindai di Dasbor Logistik untuk mencairkan bantuan sembako. Proses pertama berhasil dan stok gudang terpotong otomatis. Petugas langsung mencoba memindai ulang token yang sama untuk kedua kalinya. Sistem dengan cepat menolak klaim tersebut dan membunyikan alarm visual kuning di hadapan juri, membuktikan keandalan fitur proteksi kecurangan.
-4. **Pelayanan Medis Anonim:** Token yang sama dibawa ke tenda medis. Dasbor dokter terbuka, menampilkan riwayat alergi obat darurat secara anonim tanpa membuka data nama asli korban, demi membuktikan kepatuhan terhadap regulasi privasi data kemanusiaan.
-5. **Simulasi Akhir Misi (Crypto-Shredding Trigger):** Komandan Posko masuk ke sistem, lalu mengeksekusi fitur penghancuran data darurat. Aplikasi seketika terkunci dan seluruh baris data sensitif di database terbukti rusak total menjadi karakter acak yang tidak bisa dibaca lagi, menutup sesi presentasi dengan pembuktian kepatuhan total perlindungan data.
+1. Anggota Tim 2 menyamar sebagai pengungsi yang hanyut dan kehilangan KTP.
+2. Anggota Tim 1 memilih mode "Registrasi Darurat (Saksi Komunitas)", memindai gelang QR warga lokal penjamin, lalu mengambil gambar wajah Tim 2 via webcam.
+3. Next.js secara instan menghasilkan QR Code token gelang baru.
+4. Juri diperlihatkan database SQLite di mana wajah korban terbukti langsung berubah menjadi mosaik Base64 abstrak terenkripsi.
+
+## Skenario 2 — Jalur Petugas Logistik (Validasi Klaim Ganda)
+
+1. Token gelang QR tersebut dibawa ke pos logistik untuk mencairkan bantuan sembako.
+2. Pemindaian pertama sukses dan memotong stok gudang secara otomatis.
+3. Petugas langsung mencoba memindai ulang gelang yang sama untuk kedua kalinya.
+4. Component UI Next.js langsung memicu suara alarm peringatan merah tebal akibat respon error status 400 dari server, membuktikan keandalan sistem proteksi.
+
+## Skenario 3 — Jalur Petugas Medis (Pelayanan Medis Anonim)
+
+1. Gelang dibawa ke pos kesehatan darurat posko.
+2. Dokter memindai QR gelang tersebut menggunakan webcam di dashboard medis.
+3. Next.js otomatis me-render rekam medis darurat secara anonim tanpa membuka identitas asli korban untuk menjaga privasi rekam jejak kesehatan.
+
+## Skenario 4 — Jalur Akhir Komandan Posko (Crypto-Shredding Trigger)
+
+1. Komandan masuk ke dasbor pengaturan khusus keamanan tingkat tinggi.
+2. Komandan menekan tombol merah darurat, server Next.js seketika menghapus master key dari memori RAM server lokal.
+3. Buka kembali aplikasi Prisma Studio/DB Browser di depan mata juri. Seluruh baris data di database SQLite terbukti terkunci permanen menjadi teks acak tidak terbaca selamanya di hadapan juri.
 
 ---
 
-# 33. Analisis Risiko Teknis & Solusi Lapangan
+# 33. Risiko dan Solusi
 
-## 33.1 Risiko 1: Gangguan Listrik Padam Tiba-Tiba saat Penulisan Data
+## 33.1 Risiko Operasional Lapangan
 
-* **Dampak Kebencanaan:** Database lokal berpotensi mengalami kerusakan file (*Data Corruption*) jika laptop server posko mati mendadak saat proses pengoperasian tulis SQL.
-* **Solusi SADANA:** Mengonfigurasi database engine PostgreSQL dengan fitur *Write-Ahead Logging* (WAL) aktif, serta mewajibkan implementasi arsitektur UPS/Baterai cadangan internal laptop server terjaga pada level performa optimal selama krisis.
+* Kerusakan fisik perangkat laptop server pusat posko darurat akibat tertimpa runtuhan atau terkena air krisis.
+* Hilangnya pasokan daya listrik generator utama posko yang memicu matinya laptop server (*hard shutdown*) dan lenyapnya kunci master di memori RAM.
+* Sensor kamera rewel akibat cuaca ekstrem hujan badai, lensa berembun, atau gelang QR sobek kotor berlumpur.
 
-## 33.2 Risiko 2: Kunci Enkripsi Master Terbaca Oknum yang Mencuri Laptop Petugas
+## 33.2 Solusi Aktif Kontingensi (Fail-Safe)
 
-* **Dampak Kebencanaan:** Enkripsi database AES-256 menjadi tidak berguna jika kunci pembukanya ikut tersimpan secara statis di laptop lapangan yang hilang dicuri.
-* **Solusi SADANA:** Mengimplementasikan konsep *RAM-Only Key Deployment*. Kunci enkripsi utama wajib diinput manual oleh Komandan melalui flashdisk fisik terpisah saat pertama kali menyalakan server lokal. Jika laptop dimatikan secara paksa atau dicuri, pasokan listrik RAM terputus, kunci hilang dari memori secara otomatis, dan database mengunci diri secara absolut.
+* **Local Hot-Standby Replication:** Menggunakan jaringan Wi-Fi lokal posko secara peer-to-peer. Setiap 30 detik laptop logistik melakukan background replication data SQLite terenkripsi sehingga bisa menggantikan server utama jika hancur.
+* **Shamir's Secret Sharing:** Kunci master enkripsi dipecah menjadi 3 token biner terpisah dengan skema ambang batas `2-of-3`. Penggabungan minimal 2 token fisik dari para pemegang otoritas saat menyalakan komputer kembali akan merekonstruksi ulang kunci master di dalam RAM secara instan.
+* **SOP Kertas Kriptografis HOTP:** Jika komputer posko padam total, petugas logistik membagikan bansos secara manual menggunakan kertas voucher fisik berbasis rumus matematika deterministik algoritma HOTP.
 
 ---
 
-# 34. Strategi Rekomendasi Implementasi Bertahap (Sprint Execution)
+# 34. Rekomendasi Implementasi Bertahap
 
-Guna memastikan proyek selesai tepat waktu dalam target pengerjaan cepat bersama AI Agent, ikuti panduan urutan kerja taktis berikut:
+Urutan eksekusi taktis 2 programmer dalam pengerjaan 10 jam live coding:
 
-1. **Fase 1 (Jam 01 - 02):** Setup struktur database lokal, pembuatan tabel migrasi relasional, dan pengujian konektivitas driver basis data lokal.
-2. **Fase 2 (Jam 02 - 04):** Penulisan logika enkripsi dasar satu arah pada `SecurityCryptoService` dan validasi login multi-role akun petugas.
-3. **Fase 3 (Jam 04 - 07):** Slicing antarmuka visual Tailwind CSS untuk halaman registrasi korban, modul scanner logistik, dan dasbor medis. Integrasi fungsi Javascript pembaca kode QR.
-4. **Fase 4 (Jam 07 - 09):** Penggabungan modul back-end dengan tampilan UI Livewire. Pengujian penguncian data klaim ganda dan sinkronisasi log harian.
-5. **Fase 5 (Jam 09 - 10):** Pembuatan tombol pintas fungsi darurat *Crypto-Shredding*, pembersihan sisa *bug* kode, dan simulasi demo presentasi akhir.
+1. Inisialisasi boilerplate Vite Next.js, instalasi Tailwind CSS, dan inisialisasi skema database Prisma SQLite.
+2. Penulisan modul logika hashing SHA-256 Salted NIK dan enkripsi AES-256 di hulu Server Actions.
+3. Pembuatan Route Guard middleware Next.js untuk otentikasi role-based petugas lapangan.
+4. Slicing layout dinamis dashboard operasional petugas registrasi.
+5. Slicing layout dinamis dashboard operasional petugas logistik.
+6. Slicing layout dinamis dashboard operasional petugas medis.
+7. Slicing layout dinamis dashboard operasional Komandan Posko.
+8. Integrasi komponen kamera pemindai `html5-qrcode` di sisi front-end React.
+9. Implementasi modul kamera capture wajah client-side terikat elemen HTML5 Canvas pixelate.
+10. Pembuatan endpoint API transaksional klaim logistik harian dan penanganan status ganda.
+11. Pembuatan endpoint API rekam medis darurat dan status klasifikasi warna Triage.
+12. Sinkronisasi pengurangan stok logistik gudang secara transaksional menggunakan kueri Prisma.
+13. Sinkronisasi pengurangan stok obat apotek darurat posko secara transaksional menggunakan kueri Prisma.
+14. Pembuatan fungsi generator acak 3 kata kunci *Mnemonic Phrase* pada database registrasi.
+15. Pembuatan tombol trigger darurat Crypto-Shredding penghancuran master key di server-side Next.js.
+16. Implementasi visualisasi data agregat menggunakan chart interaktif Recharts di panel Komandan.
+17. Integrasi local state management React UI terhadap penanganan response status error API.
+18. Pengujian sistem whitelisting hardware berbasis alamat fisik MAC Address.
+19. Pembersihan sisa bug rendering, penanganan enkapsulasi kode, dan optimasi kueri basis data.
+20. Simulasi gladi bersih jalannya skenario demo "Aha! Moment" di hadapan juri.
 
 ---
 
 # 35. Kesimpulan
 
-SADANA dirancang sebagai representasi inovasi teknologi digital yang humanis, tangguh, dan aman untuk menjawab tantangan tata kelola kemanusiaan di area krisis. Melalui integrasi arsitektur *Offline-First* dan proteksi *Secure-by-Design*, platform ini membuktikan bahwa efisiensi distribusi bantuan logistik skala masif dapat dicapai tanpa harus mengorbankan hak privasi dan keamanan identitas para korban bencana yang berada dalam kondisi rentan.
-
-Dengan struktur kode yang bersih, pembagian kerja tim yang taktis bersama AI Agent, serta skenario pembuktian fitur kriptografi yang kuat, SADANA siap menjadi solusi perangkat lunak yang sangat kompetitif untuk menaklukkan puncak kejayaan pada kategori **Web Development FIT Competition 2026**.
+SADANA Next.js Edition menghadirkan keandalan teknologi web modern Single Page Application (SPA) berbasis server lokal Next.js dengan keandalan pengamanan data kemanusiaan tingkat tinggi (*Zero-Knowledge Storage*). Melalui inovasi sistem registrasi darurat saksi komunitas (*Web of Trust*), teknik visual mosaik di sisi front-end React, dan pemulihan gelang menggunakan protokol mnemonic, platform ini membuktikan bahwa efisiensi distribusi bantuan logistik skala masif dapat dicapai tanpa harus mengorbankan hak privasi dan keamanan identitas para korban bencana yang berada dalam kondisi rentan.
