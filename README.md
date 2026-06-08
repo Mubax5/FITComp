@@ -3,10 +3,10 @@
 
 ---
 
-**Platform:** Web Application (Responsive Dashboard) menggunakan Next.js (App Router) + Tailwind CSS + Context API
-**Backend Lokal:** Node.js (Express.js Router) + Prisma ORM Client Engine
-**Database:** SQLite (Local Server Portable / Single-File Database Engine)
-**Tema UI:** High-Contrast Safety (Biru Tua, Orange, Putih)
+**Platform:** Web Application (Responsive Dashboard) menggunakan Next.js (App Router) + Tailwind CSS + Context API</br>
+**Backend Lokal:** Node.js (Express.js Router) + Prisma ORM Client Engine</br>
+**Database:** SQLite (Local Server Portable / Single-File Database Engine)</br>
+**Tema UI:** High-Contrast Safety (Biru Tua, Orange, Putih)</br>
 **Role Auth:** Komandan Posko (Admin), Petugas Registrasi, Petugas Logistik, Petugas Medis
 
 ---
